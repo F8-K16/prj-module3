@@ -2,24 +2,30 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   loginApi,
   logoutApi,
-  getNewTokenApi,
   getProfileApi,
+  registerApi,
 } from "@/services/authApi";
 import {
   type LoginResponse,
   type AuthState,
   type LoginPayload,
-  type User,
+  type RegisterPayload,
 } from "@/types/auth";
+import { updateProfileApi } from "@/services/userApi";
+import type { User } from "@/types/user";
 
 const initialState: AuthState = {
   user: null,
-  accessToken: localStorage.getItem("access_token"),
   isAuthenticated: false,
   isInitialized: false,
-  loading: false,
-  loginLoading: false,
+
   error: null,
+  isProfileUpdated: false,
+
+  authLoading: false,
+  loginLoading: false,
+  registerLoading: false,
+  updateLoading: false,
 };
 
 export const login = createAsyncThunk<
@@ -34,9 +40,41 @@ export const login = createAsyncThunk<
   }
 });
 
-export const getProfile = createAsyncThunk("auth/getProfile", async () => {
-  const res = await getProfileApi();
-  return res.data as User;
+export const register = createAsyncThunk(
+  "auth/register",
+  async (data: RegisterPayload, { rejectWithValue }) => {
+    try {
+      const res = await registerApi(data);
+      return res;
+    } catch (err) {
+      return rejectWithValue((err as Error).message);
+    }
+  },
+);
+
+export const getProfile = createAsyncThunk<User, void, { rejectValue: string }>(
+  "auth/getProfile",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await getProfileApi();
+      return res.data;
+    } catch {
+      return rejectWithValue("UNAUTHORIZED");
+    }
+  },
+);
+
+export const updateProfile = createAsyncThunk<
+  User,
+  FormData,
+  { rejectValue: string }
+>("auth/updateProfile", async (formData, { rejectWithValue }) => {
+  try {
+    const res = await updateProfileApi(formData);
+    return res.data;
+  } catch {
+    return rejectWithValue("Update profile failed");
+  }
 });
 
 export const logout = createAsyncThunk(
@@ -44,30 +82,28 @@ export const logout = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       await logoutApi();
-    } catch {
-      return rejectWithValue("LOGOUT_FAILED");
+    } catch (err) {
+      return rejectWithValue(
+        err instanceof Error ? err.message : "Logout failed",
+      );
     }
-  }
+  },
 );
 
 export const initAuth = createAsyncThunk(
   "auth/init",
   async (_, { dispatch, rejectWithValue }) => {
-    try {
-      await dispatch(getProfile()).unwrap();
-    } catch {
-      const refreshToken = localStorage.getItem("refresh_token");
-      if (!refreshToken) {
-        return rejectWithValue("Unauthorized");
-      }
-      try {
-        await getNewTokenApi();
-        await dispatch(getProfile()).unwrap();
-      } catch {
-        return rejectWithValue("REFRESH_FAILED");
-      }
+    const accessToken = localStorage.getItem("access_token");
+
+    if (!accessToken) {
+      return rejectWithValue("NO_TOKEN");
     }
-  }
+    try {
+      return await dispatch(getProfile()).unwrap();
+    } catch {
+      return rejectWithValue("UNAUTHORIZED");
+    }
+  },
 );
 
 const authSlice = createSlice({
@@ -77,22 +113,36 @@ const authSlice = createSlice({
     clearAuthError: (state) => {
       state.error = null;
     },
+    resetProfileUpdated(state) {
+      state.isProfileUpdated = false;
+    },
   },
   extraReducers: (builder) => {
     builder
       // INIT
+      .addCase(initAuth.pending, (state) => {
+        state.isInitialized = false;
+      })
       .addCase(initAuth.fulfilled, (state) => {
+        state.isAuthenticated = true;
         state.isInitialized = true;
       })
-      .addCase(initAuth.rejected, (state, action) => {
-        state.isInitialized = true;
-        state.isAuthenticated = false;
+      .addCase(initAuth.rejected, (state) => {
         state.user = null;
-
-        if (action.payload === "REFRESH_FAILED") {
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("refresh_token");
-        }
+        state.isAuthenticated = false;
+        state.isInitialized = true;
+      })
+      // Register
+      .addCase(register.pending, (state) => {
+        state.registerLoading = true;
+        state.error = null;
+      })
+      .addCase(register.fulfilled, (state) => {
+        state.registerLoading = false;
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.registerLoading = false;
+        state.error = action.payload as string;
       })
 
       // LOGIN
@@ -102,13 +152,15 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loginLoading = false;
-        state.accessToken = action.payload.access_token;
-        state.user = action.payload.user;
         state.isAuthenticated = true;
         state.isInitialized = true;
 
-        localStorage.setItem("access_token", action.payload.access_token);
-        localStorage.setItem("refresh_token", action.payload.refresh_token);
+        const { user, tokens } = action.payload.data;
+
+        state.user = user;
+
+        localStorage.setItem("access_token", tokens.accessToken);
+        localStorage.setItem("refresh_token", tokens.refreshToken);
       })
       .addCase(login.rejected, (state, action) => {
         state.loginLoading = false;
@@ -122,23 +174,44 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
       })
 
+      // UPDATE PROFILE
+      .addCase(updateProfile.pending, (state) => {
+        state.updateLoading = true;
+        state.error = null;
+        state.isProfileUpdated = false;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.updateLoading = false;
+        state.user = action.payload;
+        state.isProfileUpdated = true;
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.updateLoading = false;
+        state.error = action.payload as string;
+      })
+
       // LOGOUT
       .addCase(logout.pending, (state) => {
-        state.loading = true;
+        state.authLoading = true;
       })
       .addCase(logout.fulfilled, (state) => {
-        state.loading = false;
+        state.authLoading = false;
         state.user = null;
-        state.accessToken = null;
         state.isAuthenticated = false;
+
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
       })
       .addCase(logout.rejected, (state) => {
-        state.loading = false;
+        state.authLoading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
       });
   },
 });
 
 export default authSlice.reducer;
-export const { clearAuthError } = authSlice.actions;
+export const { clearAuthError, resetProfileUpdated } = authSlice.actions;

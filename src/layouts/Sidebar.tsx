@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import {
   Home,
   Compass,
@@ -6,7 +6,6 @@ import {
   Search,
   Instagram,
   Heart,
-  User,
   Menu,
   SquarePlus,
 } from "lucide-react";
@@ -16,11 +15,19 @@ import NotificationModal from "@/components/modals/NotificationModal";
 import SidebarActionButton from "@/components/buttons/SidebarActionButton";
 import OptionModal from "@/components/modals/OptionModal";
 import SidebarButton from "@/components/buttons/SidebarButton";
+import SidebarHybridButton from "@/components/buttons/SidebarHybridButton";
+import ChatModal from "@/components/modals/ChatModal";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "@/store/store";
+import { openCreateModal } from "@/features/modalSlice";
+import Avatar from "@/components/Avatar";
 
-type ActivePanel = "search" | "notification" | "option" | "create" | null;
+type ActivePanel = "search" | "notification" | "option" | "chat" | null;
 
 export default function Sidebar() {
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const user = useSelector((state: RootState) => state.auth.user);
 
   const togglePanel = (panel: ActivePanel) => {
     setActivePanel((prev) => (prev === panel ? null : panel));
@@ -33,13 +40,15 @@ export default function Sidebar() {
   const isSidebarCollapsed =
     activePanel === "search" ||
     activePanel === "notification" ||
-    activePanel === "create";
+    activePanel === "chat";
 
   return (
     <>
       <aside
         className={`hidden md:flex fixed top-0 left-0 h-screen w-84 pt-4 pb-6 px-3 z-40 flex-col ${
-          isSidebarCollapsed ? "" : "border-r border-[#262626]"
+          isSidebarCollapsed
+            ? ""
+            : "border-r border-[#dbdfe4] dark:border-[#262626] shadow-2xl"
         }`}
       >
         {isSidebarCollapsed ? (
@@ -47,10 +56,21 @@ export default function Sidebar() {
             <Instagram />
           </NavLink>
         ) : (
-          <h1 className="text-[26px] m-4">𝓘𝓷𝓼𝓽𝓪𝓰𝓻𝓪𝓶</h1>
+          <Link to="/">
+            <img
+              src="/icons/logo.svg"
+              alt="Instagram"
+              className="w-30 m-4 hidden dark:block"
+            />
+            <img
+              src="/icons/logo-light.svg"
+              alt="Instagram"
+              className="w-30 m-4 dark:hidden"
+            />
+          </Link>
         )}
 
-        <nav className="flex flex-col gap-2 mt-6">
+        <nav className="flex flex-col gap-2 mt-4">
           <SidebarButton
             to="/"
             icon={<Home />}
@@ -75,12 +95,13 @@ export default function Sidebar() {
             onNavigate={closePanel}
           />
 
-          <SidebarButton
+          <SidebarHybridButton
             to="/chat"
             icon={<MessageCircleHeart />}
             label="Tin nhắn"
-            disableActive={isSidebarCollapsed}
-            onNavigate={closePanel}
+            isActive={activePanel === "chat"}
+            isCollapsed={isSidebarCollapsed}
+            onToggle={() => togglePanel("chat")}
           />
 
           <SidebarActionButton
@@ -91,20 +112,26 @@ export default function Sidebar() {
             onClick={() => togglePanel("notification")}
           />
 
-          <SidebarButton
-            to="/profile"
-            icon={<User />}
-            label="Trang cá nhân"
-            disableActive={isSidebarCollapsed}
-            onNavigate={closePanel}
-          />
-
           <SidebarActionButton
             icon={<SquarePlus />}
             label="Tạo"
-            isActive={activePanel === "create"}
+            isActive={false}
             isCollapsed={isSidebarCollapsed}
-            onClick={() => {}}
+            onClick={() => dispatch(openCreateModal())}
+          />
+
+          <SidebarButton
+            to={user ? `/user/${user._id}` : "/"}
+            icon={
+              <Avatar
+                src={user?.profilePicture}
+                name={user?.username || "U"}
+                size={24}
+              />
+            }
+            label="Trang cá nhân"
+            disableActive={isSidebarCollapsed}
+            onNavigate={closePanel}
           />
         </nav>
 
@@ -125,7 +152,12 @@ export default function Sidebar() {
         open={activePanel === "notification"}
         onClose={closePanel}
       />
-      <OptionModal open={activePanel === "option"} onClose={closePanel} />
+      <OptionModal
+        open={activePanel === "option"}
+        onClose={closePanel}
+        userId={user?._id}
+      />
+      <ChatModal open={activePanel === "chat"} onClose={closePanel} />
     </>
   );
 }

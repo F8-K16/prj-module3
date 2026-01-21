@@ -1,8 +1,8 @@
 export default function Loading() {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-transparent">
+    <div className="fixed inset-0 flex items-center justify-center bg-[#0c1014]">
       <img
-        src="/icons/logo.svg"
+        src="/icons/favicon.png"
         alt="Instagram"
         className="w-20 h-20 animate-pulse"
       />

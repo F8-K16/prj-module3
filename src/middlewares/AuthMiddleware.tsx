@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-import Loading from "@/components/Loading";
+import Loading from "@/utils/loading/Loading";
 
 export default function AuthMiddleware() {
   const { isAuthenticated, isInitialized } = useSelector(

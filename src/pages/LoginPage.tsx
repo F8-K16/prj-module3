@@ -20,9 +20,11 @@ export default function LoginPage() {
           <div className="flex items-center justify-center">
             <div className="w-full max-w-sm space-y-6">
               <div className="bg-transparent px-10 pb-6 space-y-6">
-                <h1 className="text-4xl font-semibold text-center font-serif mb-12">
-                  𝓘𝓷𝓼𝓽𝓪𝓰𝓻𝓪𝓶
-                </h1>
+                <img
+                  src="/icons/logo.svg"
+                  alt="Instagram"
+                  className="w-45 mx-auto mb-10"
+                />
 
                 {mode === "login" ? <LoginForm /> : <RegisterForm />}
               </div>

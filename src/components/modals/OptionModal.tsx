@@ -8,7 +8,15 @@ import type { ModalProps } from "@/types/modal";
 import { useNavigate } from "react-router-dom";
 import useEscapeKey from "@/hooks/useEscapeKey";
 
-export default function OptionModal({ open, onClose }: ModalProps) {
+interface OptionModalProps extends ModalProps {
+  userId?: string;
+}
+
+export default function OptionModal({
+  open,
+  onClose,
+  userId,
+}: OptionModalProps) {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const [view, setView] = useState<"main" | "theme">("main");
@@ -24,7 +32,7 @@ export default function OptionModal({ open, onClose }: ModalProps) {
         <div className="absolute w-72 bottom-20 left-4 bg-[#f8f9f9] dark:bg-[#25292e] shadow-lg rounded-2xl px-2 py-3">
           <button
             onClick={() => {
-              navigate("/profile?tab=saved");
+              navigate(`/user/${userId}/saved`);
               onClose();
             }}
             className="flex w-full items-center gap-3 rounded-lg p-3 cursor-pointer hover:bg-[#f3f3f3] dark:hover:bg-[#37383a]"
@@ -41,7 +49,10 @@ export default function OptionModal({ open, onClose }: ModalProps) {
           </button>
 
           <button
-            onClick={() => dispatch(logout())}
+            onClick={async () => {
+              await dispatch(logout());
+              navigate("/login", { replace: true });
+            }}
             className="flex w-full items-center gap-3 rounded-lg p-3 cursor-pointer hover:bg-[#f3f3f3] text-red-500 dark:hover:bg-[#37383a]"
           >
             <LogOut />

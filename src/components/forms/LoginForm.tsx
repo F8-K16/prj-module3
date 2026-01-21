@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { AppDispatch, RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
-import { loginSchema, type LoginSchemaType } from "@/schemas/authSchema";
+import { loginSchema, type LoginSchemaType } from "@/schema/schema";
 import { clearAuthError, login } from "@/features/authSlice";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -19,7 +19,7 @@ export default function LoginForm() {
   const navigate = useNavigate();
   const location = useLocation() as { state: LocationState | null };
   const { error, isAuthenticated, loginLoading } = useSelector(
-    (state: RootState) => state.auth
+    (state: RootState) => state.auth,
   );
 
   const {
@@ -96,8 +96,13 @@ export default function LoginForm() {
         className="flex items-center justify-center gap-2 w-full
           text-[#1877f2] text-sm font-semibold cursor-pointer"
       >
-        <span className="bg-[#0095f6] rounded-full">
-          <Facebook size={20} fill="#0c1014" strokeWidth={0} />
+        <span className="relative bg-[#0095f6] rounded-full w-5 h-5">
+          <Facebook
+            size={20}
+            fill="#0c1014"
+            strokeWidth={0}
+            className="absolute left-1/2 -bottom-0.5 -translate-x-1/2"
+          />
         </span>
         Đăng nhập bằng Facebook
       </button>

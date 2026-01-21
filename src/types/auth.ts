@@ -1,19 +1,16 @@
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatar?: string;
-}
+import type { User } from "./user";
 
 export interface AuthState {
   user: User | null;
-  accessToken: string | null;
   isAuthenticated: boolean;
   isInitialized: boolean;
 
   loginLoading: boolean;
-  loading: boolean;
+  registerLoading: boolean;
+  authLoading: boolean;
+  updateLoading: boolean;
   error: string | null;
+  isProfileUpdated: boolean;
 }
 
 export interface LoginPayload {
@@ -23,28 +20,24 @@ export interface LoginPayload {
 
 export interface RegisterPayload {
   email: string;
+  username: string;
   password: string;
-  name: string;
+  confirmPassword: string;
+  fullName: string;
 }
 
 export interface LoginResponse {
-  access_token: string;
-  refresh_token: string;
-  user: User;
+  success: boolean;
+  message: string;
+  data: {
+    user: User;
+    tokens: {
+      accessToken: string;
+      refreshToken: string;
+    };
+  };
 }
 
-export interface RefreshResponse {
-  access_token: string;
-  refresh_token: string;
+export interface ResendVerifyPayload {
+  email: string;
 }
-
-export interface ApiErrorResponse {
-  message?: string;
-}
-
-export interface RegisterResponse {
-  accessToken: string;
-  user: User;
-}
-
-export type ProfileResponse = User;

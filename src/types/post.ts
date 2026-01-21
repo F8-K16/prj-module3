@@ -1,28 +1,44 @@
-export type PostModalState = {
-  isOpen: boolean;
-  post: Post | null;
-};
-
-export interface Comment {
-  id: number;
-  createdAt?: string;
-  user: {
-    name: string;
-    avatar: string;
-  };
-  text: string;
+export interface PostUser {
+  _id: string;
+  username: string;
+  profilePicture?: string;
 }
 
 export interface Post {
-  id: number;
-  image: string | string[];
+  _id: string;
   caption: string;
+  image?: string;
+  video?: string | null;
+  mediaType: "image" | "video";
   likes: number;
-  isLiked?: boolean;
-  comments: Comment[];
+  isLiked: boolean;
+  isSaved: boolean;
+  likedBy: string[];
+  savedBy: string[];
+  comments: number;
   createdAt: string;
-  user: {
-    name: string;
-    avatar: string;
-  };
+  updatedAt: string;
+  userId: PostUser;
+}
+
+export type PostState = {
+  posts: Post[];
+  postLoading: boolean;
+  createLoading: boolean;
+  deleteLoading: boolean;
+  updateLoading: boolean;
+  deletedPostId: string | null;
+};
+
+export type PostDetailState = {
+  post: Post | null;
+  postDetailLoading: boolean;
+  error?: string;
+};
+
+export interface UpdatePostCaptionResponse {
+  _id: string;
+  caption: string;
+  image?: string;
+  updatedAt: string;
 }

@@ -1,10 +1,10 @@
-interface SidebarActionButtonProps {
+type SidebarActionButtonProps = {
   icon: React.ReactNode;
   label: string;
   isActive: boolean;
   isCollapsed: boolean;
   onClick: () => void;
-}
+};
 
 export default function SidebarActionButton({
   icon,
@@ -19,7 +19,7 @@ export default function SidebarActionButton({
       className={`
         flex items-center rounded-lg p-3 transition hover:bg-[#f3f3f3] dark:hover:bg-[#25282c] cursor-pointer
         ${isCollapsed ? "w-15 justify-center p-2" : "gap-4"}
-        ${isActive ? "font-bold bg-[#f3f5f7] dark:bg-[#25292e]" : ""}
+        ${isActive ? "font-bold  bg-[#cbcbcb] dark:bg-[#25292e]" : ""}
       `}
     >
       {icon}

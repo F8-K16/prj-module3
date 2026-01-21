@@ -20,7 +20,7 @@ export default function SidebarButton({
       className={({ isActive }) =>
         `flex items-center rounded-lg p-3 transition hover:bg-[#f3f3f3] dark:hover:bg-[#25282c]
          ${disableActive ? "w-15 justify-center" : "gap-4"}
-         ${isActive && !disableActive ? "font-bold stroke-white" : ""}`
+         ${isActive && !disableActive ? "font-bold" : ""}`
       }
     >
       {icon}

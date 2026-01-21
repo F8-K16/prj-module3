@@ -11,29 +11,55 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "./store/store";
 import { useEffect } from "react";
 import { initAuth } from "./features/authSlice";
-import Loading from "./components/Loading";
+import Loading from "./utils/loading/Loading";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
+import VerifyEmailTokenPage from "./pages/VerifyEmailTokenPage";
+import InfoPage from "./pages/InfoPage";
+import ChatDetailPage from "./pages/ChatDetailPage";
+import { connectSocket, disconnectSocket } from "./socket/socket";
 
 export default function App() {
   const dispatch = useDispatch<AppDispatch>();
-  const { loading } = useSelector((state: RootState) => state.auth);
+  const { authLoading, isAuthenticated } = useSelector(
+    (state: RootState) => state.auth,
+  );
 
   useEffect(() => {
     dispatch(initAuth());
   }, [dispatch]);
 
-  if (loading) {
+  useEffect(() => {
+    if (isAuthenticated) {
+      const token = localStorage.getItem("access_token");
+      if (token) {
+        connectSocket(token);
+      }
+    } else {
+      disconnectSocket();
+    }
+  }, [isAuthenticated]);
+
+  if (authLoading) {
     return <Loading />;
   }
   return (
     <>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
+        <Route path="/verify-email/:token" element={<VerifyEmailTokenPage />} />
+
         <Route element={<AuthMiddleware />}>
           <Route element={<MainLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/explore" element={<ExplorePage />} />
             <Route path="/chat" element={<ChatPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
+            <Route
+              path="/direct/:conversationId"
+              element={<ChatDetailPage />}
+            />
+            <Route path="/user/:userId/*" element={<ProfilePage />} />
+            <Route path="/profile" element={<InfoPage />} />
           </Route>
         </Route>
       </Routes>
