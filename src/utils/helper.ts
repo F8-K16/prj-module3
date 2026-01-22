@@ -1,5 +1,6 @@
 import type { Conversation } from "@/types/message";
 import type { User } from "@/types/user";
+import { useLocation } from "react-router-dom";
 
 export const markAsFollowing = (users: User[], userId: string) => {
   const user = users.find((u) => u._id === userId);
@@ -95,3 +96,9 @@ export const getOtherUser = (
   authUserId: string,
 ): User | undefined =>
   conversation.participants.find((u) => u._id !== authUserId);
+
+export function useHideChatUI() {
+  const { pathname } = useLocation();
+
+  return pathname === "/chat" || pathname.startsWith("/direct");
+}

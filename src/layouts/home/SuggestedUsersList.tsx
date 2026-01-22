@@ -16,6 +16,7 @@ export default function SuggestedUsersList() {
     (state: RootState) => state.users,
   );
   const authUser = useSelector((state: RootState) => state.auth.user);
+  console.log(suggestedUsers);
 
   if (userLoading) {
     return <Loading />;

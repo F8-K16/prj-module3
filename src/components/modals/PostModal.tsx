@@ -148,7 +148,7 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
               controls
               autoPlay
               loop
-              className="w-full h-full object-fill"
+              className="w-full h-full object-contain"
             />
           )}
         </div>

@@ -69,7 +69,12 @@ export default function PostOptionsModal() {
 
             <button
               disabled={deleteLoading}
-              onClick={() => dispatch(deletePost(postId!))}
+              onClick={() => {
+                {
+                  dispatch(deletePost(postId!));
+                  dispatch(closeModal());
+                }
+              }}
               className="w-full py-3 text-red-500 font-semibold hover:bg-[#333] disabled:opacity-50 cursor-pointer"
             >
               {deleteLoading ? "Đang xóa..." : "Xác nhận xóa"}

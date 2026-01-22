@@ -3,6 +3,7 @@ import {
   getConversations,
   getMessagesByConversation,
   getUnreadCount,
+  markMessageAsRead,
   sendImageMessage,
   sendTextMessage,
 } from "@/services/messageApi";
@@ -18,13 +19,11 @@ const initialState: MessageState = {
   currentConversation: null,
   messages: [],
   unreadCount: 0,
-  loading: false,
+  conversationsLoading: false,
+  messagesLoading: false,
   typingUsers: {},
 };
 
-/**
- * Get conversations
- */
 export const fetchConversations = createAsyncThunk<Conversation[]>(
   "message/fetchConversations",
   async () => {
@@ -32,9 +31,6 @@ export const fetchConversations = createAsyncThunk<Conversation[]>(
   },
 );
 
-/**
- * Create or get conversation
- */
 export const fetchOrCreateConversation = createAsyncThunk<Conversation, string>(
   "message/fetchOrCreateConversation",
   async (userId) => {
@@ -42,9 +38,6 @@ export const fetchOrCreateConversation = createAsyncThunk<Conversation, string>(
   },
 );
 
-/**
- * Get messages by conversation
- */
 export const fetchMessages = createAsyncThunk<Message[], string>(
   "message/fetchMessages",
   async (conversationId) => {
@@ -52,9 +45,6 @@ export const fetchMessages = createAsyncThunk<Message[], string>(
   },
 );
 
-/**
- * Send text message
- */
 export const sendTextMessageThunk = createAsyncThunk<
   Message,
   {
@@ -66,9 +56,6 @@ export const sendTextMessageThunk = createAsyncThunk<
   return await sendTextMessage(payload);
 });
 
-/**
- * Send image message
- */
 export const sendImageMessageThunk = createAsyncThunk<
   Message,
   {
@@ -80,15 +67,19 @@ export const sendImageMessageThunk = createAsyncThunk<
   return await sendImageMessage(payload);
 });
 
-/**
- * Get unread count
- */
 export const fetchUnreadCount = createAsyncThunk<number>(
   "message/fetchUnreadCount",
   async () => {
     return await getUnreadCount();
   },
 );
+
+export const markMessageAsReadThunk = createAsyncThunk<
+  { _id: string; isRead: boolean },
+  string
+>("message/markMessageAsRead", async (messageId) => {
+  return await markMessageAsRead(messageId);
+});
 
 const messageSlice = createSlice({
   name: "message",
@@ -110,6 +101,24 @@ const messageSlice = createSlice({
     },
     pushMessage(state, action: PayloadAction<Message>) {
       state.messages.push(action.payload);
+    },
+    pushOptimisticMessage(state, action: PayloadAction<Message>) {
+      state.messages.push(action.payload);
+    },
+    updateMessageStatus(
+      state,
+      action: PayloadAction<{
+        id: string;
+        status: "sending" | "sent" | "failed";
+      }>,
+    ) {
+      const { id, status } = action.payload;
+
+      const msg = state.messages.find((m) => m._id === id);
+      if (msg) {
+        msg.status = status;
+        msg.optimistic = false;
+      }
     },
     handleIncomingMessage: (state, action: PayloadAction<Message>) => {
       const msg = action.payload;
@@ -161,10 +170,10 @@ const messageSlice = createSlice({
 
       // Conversations
       .addCase(fetchConversations.pending, (state) => {
-        state.loading = true;
+        state.conversationsLoading = true;
       })
       .addCase(fetchConversations.fulfilled, (state, action) => {
-        state.loading = false;
+        state.conversationsLoading = false;
         state.conversations = action.payload.map((serverConversation) => {
           const localConversation = state.conversations.find(
             (c) => c._id === serverConversation._id,
@@ -187,7 +196,7 @@ const messageSlice = createSlice({
         });
       })
       .addCase(fetchConversations.rejected, (state) => {
-        state.loading = false;
+        state.conversationsLoading = false;
       })
 
       // Create / Get conversation
@@ -204,7 +213,7 @@ const messageSlice = createSlice({
 
       // Messages
       .addCase(fetchMessages.pending, (state) => {
-        state.loading = true;
+        state.messagesLoading = true;
       })
       .addCase(fetchMessages.fulfilled, (state, action) => {
         if (
@@ -213,13 +222,13 @@ const messageSlice = createSlice({
         ) {
           state.messages = action.payload;
         }
-        state.loading = false;
+        state.messagesLoading = false;
       })
       .addCase(fetchMessages.rejected, (state) => {
-        state.loading = false;
+        state.messagesLoading = false;
       })
 
-      // Send text / image message
+      // Send text message
       .addCase(
         sendTextMessageThunk.fulfilled,
         (state, action: PayloadAction<Message>) => {
@@ -247,9 +256,54 @@ const messageSlice = createSlice({
         },
       )
 
+      // Send image message
+      .addCase(sendImageMessageThunk.fulfilled, (state, action) => {
+        const realMsg = action.payload;
+
+        const optimisticMsg = state.messages.find(
+          (m) =>
+            m.messageType === "image" &&
+            m.optimistic &&
+            m.status === "sending" &&
+            m.conversationId === realMsg.conversationId,
+        );
+
+        if (optimisticMsg) {
+          Object.assign(optimisticMsg, {
+            ...realMsg,
+            optimistic: false,
+            status: "sent",
+          });
+        } else {
+          state.messages.push({
+            ...realMsg,
+            status: "sent",
+          });
+        }
+
+        const conversation = state.conversations.find(
+          (c) => c._id === realMsg.conversationId,
+        );
+
+        if (conversation) {
+          conversation.lastMessage = realMsg;
+          conversation.lastMessageAt = realMsg.createdAt;
+        }
+      })
+
       // Unread count
       .addCase(fetchUnreadCount.fulfilled, (state, action) => {
         state.unreadCount = action.payload;
+      })
+
+      // Mark as read
+      .addCase(markMessageAsReadThunk.fulfilled, (state, action) => {
+        const { _id, isRead } = action.payload;
+
+        const msg = state.messages.find((m) => m._id === _id);
+        if (msg) {
+          msg.isRead = isRead;
+        }
       });
   },
 });
@@ -259,6 +313,8 @@ export const {
   clearMessages,
   setCurrentConversation,
   pushMessage,
+  pushOptimisticMessage,
+  updateMessageStatus,
   clearUnreadForConversation,
   handleIncomingMessage,
   userTyping,

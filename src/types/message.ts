@@ -12,6 +12,9 @@ export interface Message {
   imageUrl?: string;
   isRead: boolean;
   createdAt: string;
+
+  optimistic?: boolean;
+  status?: "sending" | "sent" | "failed";
 }
 
 export interface Conversation {
@@ -28,7 +31,8 @@ export interface MessageState {
   currentConversation: Conversation | null;
   messages: Message[];
   unreadCount: number;
-  loading: boolean;
+  conversationsLoading: boolean;
+  messagesLoading: boolean;
   error?: string;
   typingUsers: Record<string, string[]>;
 }

@@ -78,7 +78,27 @@ const modalSlice = createSlice({
       state.postId = action.payload.postId;
       state.parentModal = "post";
     },
+    openChatListModal(state) {
+      state.activeModal = "chat-list";
+    },
+    openMiniChat(state, action) {
+      state.activeModal = "chat-mini";
+      state.conversationId = action.payload;
+    },
+    closeChatModals(state) {
+      if (
+        state.activeModal === "chat-list" ||
+        state.activeModal === "chat-mini"
+      ) {
+        state.activeModal = null;
+      }
 
+      state.conversationId = null;
+    },
+    backToChatList(state) {
+      state.activeModal = "chat-list";
+      state.conversationId = null;
+    },
     closeModal(state) {
       if (
         state.activeModal === "comment-options" ||
@@ -109,6 +129,10 @@ export const {
   openPostOptionsModal,
   openEditCommentModal,
   openEditPostModal,
+  openChatListModal,
+  openMiniChat,
+  backToChatList,
+  closeChatModals,
   closeModal,
 } = modalSlice.actions;
 

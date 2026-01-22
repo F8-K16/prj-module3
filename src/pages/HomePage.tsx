@@ -102,7 +102,7 @@ export default function HomePage() {
                     autoPlay
                     muted
                     loop
-                    className="w-full h-125 rounded-lg object-cover"
+                    className="w-full h-full rounded-lg"
                   />
                 )}
               </CardContent>

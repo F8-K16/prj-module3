@@ -7,7 +7,9 @@ type ModalType =
   | "comment-options"
   | "post-options"
   | "edit-comment"
-  | "edit-post";
+  | "edit-post"
+  | "chat-list"
+  | "chat-mini";
 
 export type ModalState = {
   activeModal: ModalType | null;
@@ -18,6 +20,7 @@ export type ModalState = {
   commentOwnerId?: string | null;
   ownerId?: string | null;
   parentModal?: ModalType | null;
+  conversationId?: string | null;
 };
 
 export interface ModalProps {

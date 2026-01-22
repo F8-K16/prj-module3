@@ -6,7 +6,7 @@ import {
 import { openNewMessageModal } from "@/features/modalSlice";
 import type { AppDispatch, RootState } from "@/store/store";
 import type { ModalProps } from "@/types/modal";
-import { SquarePen } from "lucide-react";
+import { ImageIcon, SquarePen } from "lucide-react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -19,10 +19,10 @@ export default function ChatModal({ open }: ModalProps) {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const { conversations, loading } = useSelector(
-    (state: RootState) => state.messages,
-  );
+  const { conversations, conversationsLoading, currentConversation } =
+    useSelector((state: RootState) => state.messages);
   const authUser = useSelector((state: RootState) => state.auth.user);
+  console.log(conversations);
 
   useEffect(() => {
     if (open) {
@@ -30,13 +30,13 @@ export default function ChatModal({ open }: ModalProps) {
     }
   }, [open, dispatch]);
 
-  if (!open || !authUser) return null;
-
   const handleOpenConversation = (conversation: Conversation) => {
     dispatch(setCurrentConversation(conversation));
     dispatch(clearUnreadForConversation(conversation._id));
     navigate(`/direct/${conversation._id}`);
   };
+
+  if (!open || !authUser) return null;
 
   return (
     <div className="fixed top-0 left-20 h-full w-100 z-50 border-r border-[#dbdfe4] shadow-2xl dark:border-[#262626] dark:border-l animate-in fade-in bg-white dark:bg-[#0c1014]">
@@ -44,7 +44,10 @@ export default function ChatModal({ open }: ModalProps) {
         {/* Header */}
         <div className="flex items-center justify-between">
           <span className="text-xl font-semibold">{authUser.username}</span>
-          <button onClick={() => dispatch(openNewMessageModal())}>
+          <button
+            className="cursor-pointer hover:opacity-70"
+            onClick={() => dispatch(openNewMessageModal())}
+          >
             <SquarePen />
           </button>
         </div>
@@ -58,21 +61,26 @@ export default function ChatModal({ open }: ModalProps) {
       <div className="font-semibold mb-2 px-6">Tin nhắn</div>
 
       <div className="space-y-2">
-        {loading && (
+        {conversationsLoading && (
           <div className="ml-6 mt-3">
             <Spinner />
           </div>
         )}
 
-        {!loading &&
+        {!conversationsLoading &&
           conversations.map((conversation: Conversation) => {
             const otherUser = getOtherUser(conversation, authUser._id);
+            const isActive = currentConversation?._id === conversation._id;
 
             return (
               <div
                 key={conversation._id}
                 onClick={() => handleOpenConversation(conversation)}
-                className="flex items-center gap-3 px-6 py-2.5 cursor-pointer hover:bg-gray-100 dark:hover:bg-[#333]"
+                className={`flex items-center gap-3 px-6 py-2.5 cursor-pointer ${
+                  isActive
+                    ? "bg-gray-200 dark:bg-[#2a2a2a]"
+                    : "hover:bg-gray-100 dark:hover:bg-[#333]"
+                }`}
               >
                 <Avatar
                   src={otherUser?.profilePicture}
@@ -86,14 +94,22 @@ export default function ChatModal({ open }: ModalProps) {
                   </p>
 
                   <div className="flex gap-1">
-                    <p className="text-xs text-[#a8a8a8] truncate">
+                    <p className="flex gap-1.5 text-xs text-[#a8a8a8] truncate">
                       {conversation.lastMessage ? (
                         <>
                           {conversation.lastMessage.senderId ===
                             authUser._id && (
                             <span className="font-medium">Bạn: </span>
                           )}
-                          {conversation.lastMessage.content}
+
+                          {conversation.lastMessage.messageType === "image" ? (
+                            <span className="flex items-center gap-1">
+                              <ImageIcon size={14} />
+                              <span>Ảnh</span>
+                            </span>
+                          ) : (
+                            conversation.lastMessage.content
+                          )}
                         </>
                       ) : (
                         "Bắt đầu trò chuyện"
