@@ -17,6 +17,7 @@ export type ModalState = {
   commentId?: string | null;
   commentOwnerId?: string | null;
   ownerId?: string | null;
+  parentModal?: ModalType | null;
 };
 
 export interface ModalProps {

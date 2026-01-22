@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { openPostModal } from "@/features/modalSlice";
+import { openPostModal, openPostOptionsModal } from "@/features/modalSlice";
 import type { AppDispatch, RootState } from "@/store/store";
 import {
   fetchNewsfeed,
@@ -70,7 +70,18 @@ export default function HomePage() {
                       • {formatTimeAgo(post.createdAt)}
                     </p>
                   </div>
-                  <button className="ml-auto cursor-pointer">
+                  <button
+                    onClick={() =>
+                      dispatch(
+                        openPostOptionsModal({
+                          postId: post!._id,
+                          ownerId: post!.userId._id,
+                          parentModal: null,
+                        }),
+                      )
+                    }
+                    className="ml-auto cursor-pointer"
+                  >
                     <MoreHorizontal />
                   </button>
                 </div>

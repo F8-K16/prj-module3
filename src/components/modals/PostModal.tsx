@@ -175,6 +175,7 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
                   openPostOptionsModal({
                     postId: post!._id,
                     ownerId: post!.userId._id,
+                    parentModal: "post",
                   }),
                 )
               }

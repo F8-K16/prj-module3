@@ -12,21 +12,17 @@ import EditPostModal from "./EditPostModal";
 
 export default function AppModal() {
   const dispatch = useDispatch();
-  const { activeModal, postId, userId } = useSelector(
+  const { activeModal, postId, userId, parentModal } = useSelector(
     (state: RootState) => state.modal,
   );
+
+  const shouldOpenPostModal = activeModal === "post" || parentModal === "post";
 
   return (
     <>
       <PostModal
-        open={
-          activeModal === "post" ||
-          activeModal === "comment-options" ||
-          activeModal === "post-options" ||
-          activeModal === "edit-comment" ||
-          activeModal === "edit-post"
-        }
-        postId={postId}
+        open={shouldOpenPostModal}
+        postId={shouldOpenPostModal ? postId : null}
         onClose={() => dispatch(closeModal())}
       />
 

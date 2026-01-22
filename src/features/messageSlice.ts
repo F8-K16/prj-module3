@@ -19,6 +19,7 @@ const initialState: MessageState = {
   messages: [],
   unreadCount: 0,
   loading: false,
+  typingUsers: {},
 };
 
 /**
@@ -95,7 +96,6 @@ const messageSlice = createSlice({
   reducers: {
     setCurrentConversation(state, action: PayloadAction<Conversation>) {
       state.currentConversation = action.payload;
-      state.messages = [];
     },
     clearMessages(state) {
       state.messages = [];
@@ -111,6 +111,50 @@ const messageSlice = createSlice({
     pushMessage(state, action: PayloadAction<Message>) {
       state.messages.push(action.payload);
     },
+    handleIncomingMessage: (state, action: PayloadAction<Message>) => {
+      const msg = action.payload;
+
+      if (state.currentConversation?._id === msg.conversationId) {
+        state.messages.push(msg);
+      }
+
+      const conversation = state.conversations.find(
+        (c) => c._id === msg.conversationId,
+      );
+
+      if (conversation) {
+        conversation.lastMessage = msg;
+        conversation.lastMessageAt = msg.createdAt;
+
+        if (state.currentConversation?._id !== msg.conversationId) {
+          conversation.unreadCount += 1;
+        }
+      }
+    },
+    userTyping(
+      state,
+      action: PayloadAction<{ conversationId: string; userId: string }>,
+    ) {
+      const { conversationId, userId } = action.payload;
+
+      if (!state.typingUsers[conversationId]) {
+        state.typingUsers[conversationId] = [];
+      }
+
+      if (!state.typingUsers[conversationId].includes(userId)) {
+        state.typingUsers[conversationId].push(userId);
+      }
+    },
+
+    userStopTyping(
+      state,
+      action: PayloadAction<{ conversationId: string; userId: string }>,
+    ) {
+      const { conversationId, userId } = action.payload;
+
+      state.typingUsers[conversationId] =
+        state.typingUsers[conversationId]?.filter((id) => id !== userId) || [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -121,7 +165,26 @@ const messageSlice = createSlice({
       })
       .addCase(fetchConversations.fulfilled, (state, action) => {
         state.loading = false;
-        state.conversations = action.payload;
+        state.conversations = action.payload.map((serverConversation) => {
+          const localConversation = state.conversations.find(
+            (c) => c._id === serverConversation._id,
+          );
+
+          return localConversation
+            ? {
+                ...serverConversation,
+                lastMessage:
+                  localConversation.lastMessage ??
+                  serverConversation.lastMessage,
+                unreadCount:
+                  localConversation.unreadCount ??
+                  serverConversation.unreadCount,
+                lastMessageAt:
+                  localConversation.lastMessageAt ??
+                  serverConversation.lastMessageAt,
+              }
+            : serverConversation;
+        });
       })
       .addCase(fetchConversations.rejected, (state) => {
         state.loading = false;
@@ -160,7 +223,27 @@ const messageSlice = createSlice({
       .addCase(
         sendTextMessageThunk.fulfilled,
         (state, action: PayloadAction<Message>) => {
-          state.messages.push(action.payload);
+          const msg = action.payload;
+
+          if (state.currentConversation?._id === msg.conversationId) {
+            state.messages.push(msg);
+          }
+
+          const conversation = state.conversations.find(
+            (c) => c._id === msg.conversationId,
+          );
+
+          if (conversation) {
+            conversation.lastMessage = msg;
+            conversation.lastMessageAt = msg.createdAt;
+          } else {
+            state.conversations.unshift({
+              _id: msg.conversationId,
+              lastMessage: msg,
+              lastMessageAt: msg.createdAt,
+              unreadCount: 0,
+            } as Conversation);
+          }
         },
       )
 
@@ -177,4 +260,7 @@ export const {
   setCurrentConversation,
   pushMessage,
   clearUnreadForConversation,
+  handleIncomingMessage,
+  userTyping,
+  userStopTyping,
 } = messageSlice.actions;

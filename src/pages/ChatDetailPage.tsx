@@ -6,20 +6,19 @@ import type { AppDispatch, RootState } from "@/store/store";
 import {
   fetchMessages,
   sendTextMessageThunk,
-  fetchConversations,
   setCurrentConversation,
-  pushMessage,
   clearMessages,
 } from "@/features/messageSlice";
 
 import Avatar from "@/components/Avatar";
-import { getOtherUser } from "@/utils/helper";
+import { formatMessageTime, getMediaUrl, getOtherUser } from "@/utils/helper";
 import { Spinner } from "@/components/ui/spinner";
-import { offNewMessage, onNewMessage } from "@/socket/socket";
-import type { Message } from "@/types/message";
+import { Info, Phone, Video } from "lucide-react";
+import { emitStopTyping, emitTyping } from "@/socket/socket";
 
 export default function ChatDetailPage() {
   const [sending, setSending] = useState<boolean>(false);
+  const [content, setContent] = useState("");
 
   const dispatch = useDispatch<AppDispatch>();
   const { conversationId } = useParams<{ conversationId: string }>();
@@ -27,45 +26,14 @@ export default function ChatDetailPage() {
   const { currentConversation, conversations, messages, loading } = useSelector(
     (state: RootState) => state.messages,
   );
+  const typingUsers = useSelector(
+    (state: RootState) =>
+      state.messages.typingUsers[currentConversation?._id || ""],
+  );
+
   const authUser = useSelector((state: RootState) => state.auth.user);
 
-  const [content, setContent] = useState("");
   const bottomRef = useRef<HTMLDivElement | null>(null);
-
-  // Đồng bộ conversation
-  useEffect(() => {
-    if (!conversationId) return;
-
-    if (conversations.length === 0) {
-      dispatch(fetchConversations());
-      return;
-    }
-
-    const found = conversations.find((c) => c._id === conversationId);
-
-    if (found) {
-      dispatch(setCurrentConversation(found));
-    }
-  }, [conversationId, conversations, dispatch]);
-
-  // Listener events & fetch content
-  useEffect(() => {
-    if (!conversationId) return;
-
-    dispatch(fetchMessages(conversationId));
-    const handler = (message: Message) => {
-      if (message.conversationId === conversationId) {
-        dispatch(pushMessage(message));
-      }
-    };
-
-    onNewMessage(handler);
-    return () => offNewMessage(handler);
-  }, [conversationId, dispatch]);
-
-  useEffect(() => {
-    dispatch(clearMessages());
-  }, [conversationId, dispatch]);
 
   const otherUser = useMemo(() => {
     if (!currentConversation || !authUser) return null;
@@ -92,10 +60,65 @@ export default function ChatDetailPage() {
     }
   };
 
+  const typingTimeout = useRef<number | null>(null);
+
+  // Đồng bộ conversation
+  useEffect(() => {
+    if (!conversationId || conversations.length === 0) return;
+
+    const found = conversations.find((c) => c._id === conversationId);
+
+    if (found) {
+      dispatch(setCurrentConversation(found));
+    }
+  }, [conversationId, conversations, dispatch]);
+
+  // Listener events & fetch content
+  useEffect(() => {
+    if (!conversationId) return;
+    dispatch(fetchMessages(conversationId));
+  }, [conversationId, dispatch]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearMessages());
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    return () => {
+      if (currentConversation && otherUser?._id) {
+        emitStopTyping({
+          conversationId: currentConversation._id,
+          recipientId: otherUser._id,
+        });
+      }
+    };
+  }, [currentConversation, otherUser]);
+
   /* 3️⃣ Auto scroll xuống cuối */
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const handleTyping = () => {
+    if (!currentConversation || !otherUser?._id) return;
+    emitTyping({
+      conversationId: currentConversation?._id,
+      recipientId: otherUser?._id,
+    });
+
+    if (typingTimeout.current) {
+      clearTimeout(typingTimeout.current);
+    }
+
+    typingTimeout.current = setTimeout(() => {
+      emitStopTyping({
+        conversationId: currentConversation?._id,
+        recipientId: otherUser?._id,
+      });
+    }, 1200);
+  };
 
   if (!currentConversation || !otherUser) {
     return (
@@ -108,13 +131,22 @@ export default function ChatDetailPage() {
   return (
     <div className="flex flex-col h-full text-white ml-36">
       {/* Header */}
-      <div className="-mt-7 flex items-center gap-3 px-4 pb-3 border-b border-[#363636]">
+      <div className="flex -mt-7 items-center px-4 pb-3 border-b border-[#363636]">
         <Avatar
           src={otherUser?.profilePicture}
           name={otherUser?.username}
           size={44}
         />
-        <p className="font-semibold">{otherUser?.username}</p>
+
+        <div className="ml-3">
+          <p className="font-semibold text-[#f5f5f5]">{otherUser?.fullName}</p>
+          <p className="text-xs text-[#a8a8a8]">{otherUser?.username}</p>
+        </div>
+        <div className="flex items-center ml-auto gap-5">
+          <Phone />
+          <Video />
+          <Info />
+        </div>
       </div>
 
       {/* Messages */}
@@ -123,33 +155,51 @@ export default function ChatDetailPage() {
           {loading && <Spinner />}
 
           {!loading &&
-            messages.map((msg) => {
-              const isMe = msg.senderId === authUser?._id;
+            messages.map((msg, index) => {
+              const isMe =
+                (typeof msg.senderId === "string"
+                  ? msg.senderId
+                  : msg.senderId._id) === authUser?._id;
+              const prev = messages[index - 1];
+              const shouldShowTime =
+                !prev ||
+                new Date(msg.createdAt).getTime() -
+                  new Date(prev.createdAt).getTime() >
+                  5 * 60 * 1000;
 
               return (
-                <div
-                  key={msg._id}
-                  className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-                >
+                <div key={msg._id}>
+                  {shouldShowTime && (
+                    <div className="text-center text-xs text-[#8a8d91] my-3">
+                      {formatMessageTime(msg.createdAt)}
+                    </div>
+                  )}
                   <div
-                    className={`
-                    max-w-[70%] px-3 py-2 rounded-2xl text-[15px]
-                    ${
-                      isMe
-                        ? "bg-[#4a5df9] rounded-br-md"
-                        : "bg-gray-700 rounded-bl-md"
-                    }
-                  `}
+                    className={`flex items-center gap-3 ${isMe ? "justify-end" : "justify-start"}`}
                   >
-                    {msg.messageType === "text" && msg.content}
-
-                    {msg.messageType === "image" && (
-                      <img
-                        src={msg.imageUrl}
-                        alt="image"
-                        className="max-w-full rounded-lg"
+                    {typeof msg.senderId !== "string" && !isMe && (
+                      <Avatar
+                        src={getMediaUrl(msg.senderId.profilePicture)}
+                        name={msg.senderId.username}
+                        size={28}
                       />
                     )}
+
+                    <div
+                      className={`max-w-[70%] px-3 py-2 rounded-2xl text-[15px]
+                    ${isMe ? "bg-[#4a5df9]" : "bg-[#25292e]"}
+                  `}
+                    >
+                      {msg.messageType === "text" && msg.content}
+
+                      {msg.messageType === "image" && (
+                        <img
+                          src={msg.imageUrl}
+                          alt="image"
+                          className="max-w-full rounded-lg"
+                        />
+                      )}
+                    </div>
                   </div>
                 </div>
               );
@@ -164,7 +214,10 @@ export default function ChatDetailPage() {
         <div className="flex items-center gap-3">
           <input
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => {
+              setContent(e.target.value);
+              handleTyping();
+            }}
             placeholder="Nhập tin nhắn..."
             className="
               flex-1 bg-transparent border border-[#363636]
@@ -172,6 +225,9 @@ export default function ChatDetailPage() {
             "
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
           />
+          {typingUsers?.length > 0 && (
+            <p className="text-xs text-gray-400 mt-1">Đang nhập...</p>
+          )}
 
           <button
             disabled={sending}

@@ -5,7 +5,7 @@ export type MessageType = "text" | "image";
 export interface Message {
   _id: string;
   conversationId: string;
-  senderId: string;
+  senderId: User | string;
   recipientId: string;
   messageType: MessageType;
   content: string;
@@ -30,4 +30,5 @@ export interface MessageState {
   unreadCount: number;
   loading: boolean;
   error?: string;
+  typingUsers: Record<string, string[]>;
 }

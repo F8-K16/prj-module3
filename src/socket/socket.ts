@@ -58,3 +58,29 @@ export const emitStopTyping = (payload: {
 }) => {
   socket?.emit("stop_typing", payload);
 };
+
+// Receive typing
+export const onUserTyping = (
+  cb: (payload: { conversationId: string; userId: string }) => void,
+) => {
+  socket?.on("user_typing", cb);
+};
+
+export const offUserTyping = (
+  cb: (payload: { conversationId: string; userId: string }) => void,
+) => {
+  socket?.off("user_typing", cb);
+};
+
+// Receive stop typing
+export const onUserStopTyping = (
+  cb: (payload: { conversationId: string; userId: string }) => void,
+) => {
+  socket?.on("user_stop_typing", cb);
+};
+
+export const offUserStopTyping = (
+  cb: (payload: { conversationId: string; userId: string }) => void,
+) => {
+  socket?.off("user_stop_typing", cb);
+};

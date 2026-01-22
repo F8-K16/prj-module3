@@ -16,7 +16,23 @@ import VerifyEmailPage from "./pages/VerifyEmailPage";
 import VerifyEmailTokenPage from "./pages/VerifyEmailTokenPage";
 import InfoPage from "./pages/InfoPage";
 import ChatDetailPage from "./pages/ChatDetailPage";
-import { connectSocket, disconnectSocket } from "./socket/socket";
+import {
+  connectSocket,
+  disconnectSocket,
+  offNewMessage,
+  offUserStopTyping,
+  offUserTyping,
+  onNewMessage,
+  onUserStopTyping,
+  onUserTyping,
+} from "./socket/socket";
+import {
+  fetchConversations,
+  handleIncomingMessage,
+  userStopTyping,
+  userTyping,
+} from "./features/messageSlice";
+import type { Message } from "./types/message";
 
 export default function App() {
   const dispatch = useDispatch<AppDispatch>();
@@ -33,11 +49,55 @@ export default function App() {
       const token = localStorage.getItem("access_token");
       if (token) {
         connectSocket(token);
+        dispatch(fetchConversations());
       }
     } else {
       disconnectSocket();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, dispatch]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const handler = (message: Message) => {
+      dispatch(handleIncomingMessage(message));
+    };
+
+    onNewMessage(handler);
+    return () => offNewMessage(handler);
+  }, [isAuthenticated, dispatch]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const handleTyping = ({
+      conversationId,
+      userId,
+    }: {
+      conversationId: string;
+      userId: string;
+    }) => {
+      dispatch(userTyping({ conversationId, userId }));
+    };
+
+    const handleStopTyping = ({
+      conversationId,
+      userId,
+    }: {
+      conversationId: string;
+      userId: string;
+    }) => {
+      dispatch(userStopTyping({ conversationId, userId }));
+    };
+
+    onUserTyping(handleTyping);
+    onUserStopTyping(handleStopTyping);
+
+    return () => {
+      offUserTyping(handleTyping);
+      offUserStopTyping(handleStopTyping);
+    };
+  }, [isAuthenticated, dispatch]);
 
   if (authLoading) {
     return <Loading />;

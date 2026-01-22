@@ -46,6 +46,7 @@ const modalSlice = createSlice({
       state.commentId = action.payload.commentId;
       state.commentOwnerId = action.payload.ownerId;
       state.postId = action.payload.postId;
+      state.parentModal = "post";
     },
 
     openPostOptionsModal(
@@ -59,6 +60,7 @@ const modalSlice = createSlice({
       state.activeModal = "post-options";
       state.ownerId = action.payload.ownerId;
       state.postId = action.payload.postId;
+      state.parentModal = action.payload.parentModal ?? null;
     },
 
     openEditCommentModal(
@@ -68,11 +70,13 @@ const modalSlice = createSlice({
       state.activeModal = "edit-comment";
       state.postId = action.payload.postId;
       state.commentId = action.payload.commentId;
+      state.parentModal = "post";
     },
 
     openEditPostModal(state, action: PayloadAction<{ postId: string }>) {
       state.activeModal = "edit-post";
       state.postId = action.payload.postId;
+      state.parentModal = "post";
     },
 
     closeModal(state) {
@@ -82,13 +86,15 @@ const modalSlice = createSlice({
         state.activeModal === "edit-post" ||
         state.activeModal === "post-options"
       ) {
-        state.activeModal = "post";
+        state.activeModal = state.parentModal ?? null;
+        state.parentModal = null;
         return;
       }
 
       state.activeModal = null;
       state.postId = null;
       state.userId = null;
+      state.parentModal = null;
     },
   },
 });

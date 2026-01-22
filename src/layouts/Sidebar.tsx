@@ -1,4 +1,5 @@
-import { Link, NavLink } from "react-router-dom";
+/* eslint-disable react-hooks/set-state-in-effect */
+import { Link, NavLink, useLocation } from "react-router-dom";
 import {
   Home,
   Compass,
@@ -9,7 +10,7 @@ import {
   Menu,
   SquarePlus,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchModal from "@/components/modals/SearchModal";
 import NotificationModal from "@/components/modals/NotificationModal";
 import SidebarActionButton from "@/components/buttons/SidebarActionButton";
@@ -28,6 +29,13 @@ export default function Sidebar() {
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
+  const location = useLocation();
+
+  const isChatRoute =
+    location.pathname === "/chat" || location.pathname.startsWith("/direct/");
+
+  const resolvedActivePanel: ActivePanel =
+    activePanel ?? (isChatRoute ? "chat" : null);
 
   const togglePanel = (panel: ActivePanel) => {
     setActivePanel((prev) => (prev === panel ? null : panel));
@@ -38,9 +46,15 @@ export default function Sidebar() {
   };
 
   const isSidebarCollapsed =
-    activePanel === "search" ||
-    activePanel === "notification" ||
-    activePanel === "chat";
+    resolvedActivePanel === "search" ||
+    resolvedActivePanel === "notification" ||
+    resolvedActivePanel === "chat";
+
+  useEffect(() => {
+    if (!isChatRoute) {
+      setActivePanel(null);
+    }
+  }, [isChatRoute]);
 
   return (
     <>
@@ -82,7 +96,7 @@ export default function Sidebar() {
           <SidebarActionButton
             icon={<Search />}
             label="Tìm kiếm"
-            isActive={activePanel === "search"}
+            isActive={resolvedActivePanel === "search"}
             isCollapsed={isSidebarCollapsed}
             onClick={() => togglePanel("search")}
           />
@@ -99,7 +113,7 @@ export default function Sidebar() {
             to="/chat"
             icon={<MessageCircleHeart />}
             label="Tin nhắn"
-            isActive={activePanel === "chat"}
+            isActive={resolvedActivePanel === "chat"}
             isCollapsed={isSidebarCollapsed}
             onToggle={() => togglePanel("chat")}
           />
@@ -107,7 +121,7 @@ export default function Sidebar() {
           <SidebarActionButton
             icon={<Heart />}
             label="Thông báo"
-            isActive={activePanel === "notification"}
+            isActive={resolvedActivePanel === "notification"}
             isCollapsed={isSidebarCollapsed}
             onClick={() => togglePanel("notification")}
           />
@@ -147,9 +161,12 @@ export default function Sidebar() {
       </aside>
 
       {/* Modals */}
-      <SearchModal open={activePanel === "search"} onClose={closePanel} />
+      <SearchModal
+        open={resolvedActivePanel === "search"}
+        onClose={closePanel}
+      />
       <NotificationModal
-        open={activePanel === "notification"}
+        open={resolvedActivePanel === "notification"}
         onClose={closePanel}
       />
       <OptionModal
@@ -157,7 +174,7 @@ export default function Sidebar() {
         onClose={closePanel}
         userId={user?._id}
       />
-      <ChatModal open={activePanel === "chat"} onClose={closePanel} />
+      <ChatModal open={resolvedActivePanel === "chat"} onClose={closePanel} />
     </>
   );
 }

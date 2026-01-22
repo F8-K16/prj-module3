@@ -64,6 +64,32 @@ export function formatTimeAgo(dateInput: string | Date): string {
   return `${diffYears} năm`;
 }
 
+export const formatMessageTime = (iso: string) => {
+  const date = new Date(iso);
+  const now = new Date();
+
+  const diffMs = now.getTime() - date.getTime();
+  const diffMinutes = Math.floor(diffMs / 60000);
+
+  if (diffMinutes < 1) return "Vừa xong";
+  if (diffMinutes < 60) return `${diffMinutes} phút trước`;
+
+  const sameDay = date.toDateString() === now.toDateString();
+
+  if (sameDay) {
+    return date.toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  return date.toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+};
+
 export const getOtherUser = (
   conversation: Conversation,
   authUserId: string,
