@@ -16,7 +16,7 @@ import SkeletonLoading from "@/utils/loading/SkeletonLoading";
 export default function ChatListModal() {
   const dispatch = useDispatch<AppDispatch>();
 
-  const { activeModal } = useSelector((state: RootState) => state.modal);
+  const { activeModal } = useSelector((state: RootState) => state.modals);
   const open = activeModal === "chat-list";
 
   const { conversations, conversationsLoading } = useSelector(
@@ -33,7 +33,7 @@ export default function ChatListModal() {
   if (!open || !authUser || hide) return null;
 
   return (
-    <div className="fixed bottom-10 right-10 w-90 max-h-130 bg-white dark:bg-[#212328] rounded-xl shadow-2xl z-50 flex flex-col">
+    <div className="fixed bottom-10 right-10 w-90 max-h-130 bg-white dark:bg-[#212328] rounded-xl shadow-2xl z-50 flex flex-col ">
       <div className="flex items-center justify-between p-4 border-b border-[#363636]">
         <span className="font-semibold text-lg">Tin nhắn</span>
         <div className="flex gap-3">
@@ -52,7 +52,12 @@ export default function ChatListModal() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div
+        className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2
+        [&::-webkit-scrollbar-thumb]:rounded-full
+        dark:[&::-webkit-scrollbar-track]:bg-[#2c2c2c]
+        dark:[&::-webkit-scrollbar-thumb]:bg-[#9f9f9f]"
+      >
         {conversationsLoading ? (
           <div className="ml-6 mt-3">
             <SkeletonLoading count={6} />

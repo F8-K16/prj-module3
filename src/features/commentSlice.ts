@@ -1,4 +1,3 @@
-// features/commentSlice.ts
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   createPostCommentApi,
@@ -11,6 +10,7 @@ import {
 } from "@/services/commentApi";
 import type { CommentState, PostComment } from "@/types/comment";
 import type { RootState } from "@/store/store";
+import type { ApiError } from "@/types/api";
 
 const initialState: CommentState = {
   comments: [],
@@ -24,18 +24,27 @@ const initialState: CommentState = {
 export const fetchPostComments = createAsyncThunk<
   PostComment[],
   { postId: string },
-  { state: RootState }
->("comments/fetchPostComments", async ({ postId }, { getState }) => {
-  const { limit } = getState().comments;
-  const currentUserId = getState().auth.user?._id;
+  { state: RootState; rejectValue: ApiError }
+>(
+  "comments/fetchPostComments",
+  async ({ postId }, { getState, rejectWithValue }) => {
+    try {
+      const { limit } = getState().comments;
+      const currentUserId = getState().auth.user?._id;
 
-  const comments = await getPostComments(postId, limit);
+      const comments = await getPostComments(postId, limit);
 
-  return comments.map((comment) => ({
-    ...comment,
-    isLiked: currentUserId ? comment.likedBy.includes(currentUserId) : false,
-  }));
-});
+      return comments.map((comment) => ({
+        ...comment,
+        isLiked: currentUserId
+          ? comment.likedBy.includes(currentUserId)
+          : false,
+      }));
+    } catch (err) {
+      return rejectWithValue(err as ApiError);
+    }
+  },
+);
 
 export const createPostComment = createAsyncThunk<
   PostComment,
@@ -43,28 +52,31 @@ export const createPostComment = createAsyncThunk<
     postId: string;
     content: string;
     parentCommentId?: string | null;
+  },
+  { rejectValue: ApiError }
+>("comments/createPostComment", async (payload, { rejectWithValue }) => {
+  try {
+    return await createPostCommentApi(
+      payload.postId,
+      payload.content,
+      payload.parentCommentId ?? null,
+    );
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
   }
->(
-  "comments/createPostComment",
-  async ({ postId, content, parentCommentId = null }) => {
-    return await createPostCommentApi(postId, content, parentCommentId);
-  },
-);
+});
 
-export const toggleLikeComment = createAsyncThunk(
-  "comments/toggleLike",
-  async (
-    { postId, commentId }: { postId: string; commentId: string },
-    { rejectWithValue },
-  ) => {
-    try {
-      const data = await toggleLikeCommentApi(postId, commentId);
-      return data;
-    } catch {
-      return rejectWithValue("Failed to toggle like comment");
-    }
-  },
-);
+export const toggleLikeComment = createAsyncThunk<
+  PostComment,
+  { postId: string; commentId: string },
+  { rejectValue: ApiError }
+>("comments/toggleLike", async ({ postId, commentId }, { rejectWithValue }) => {
+  try {
+    return await toggleLikeCommentApi(postId, commentId);
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
+  }
+});
 
 export const fetchCommentReplies = createAsyncThunk<
   {
@@ -73,47 +85,82 @@ export const fetchCommentReplies = createAsyncThunk<
     hasMore: boolean;
   },
   { postId: string; commentId: string },
-  { state: RootState }
->("comments/fetchReplies", async ({ postId, commentId }, { getState }) => {
-  const state = getState();
-  const currentUserId = state.auth.user?._id;
+  { state: RootState; rejectValue: ApiError }
+>(
+  "comments/fetchReplies",
+  async ({ postId, commentId }, { getState, rejectWithValue }) => {
+    try {
+      const state = getState();
+      const currentUserId = state.auth.user?._id;
 
-  const comment = state.comments.comments.find((c) => c._id === commentId);
-  const limit = comment?.repliesLimit ?? 5;
-  const offset = comment?.repliesOffset ?? 0;
+      const comment = state.comments.comments.find((c) => c._id === commentId);
+      const limit = comment?.repliesLimit ?? 5;
+      const offset = comment?.repliesOffset ?? 0;
 
-  const res = await getCommentRepliesApi(postId, commentId, limit, offset);
+      const res = await getCommentRepliesApi(postId, commentId, limit, offset);
 
-  return {
-    commentId,
-    replies: res.replies.map((reply) => ({
-      ...reply,
-      isLiked: currentUserId ? reply.likedBy.includes(currentUserId) : false,
-    })),
-    hasMore: res.hasMore,
-  };
-});
+      return {
+        commentId,
+        replies: res.replies.map((reply) => ({
+          ...reply,
+          isLiked: currentUserId
+            ? reply.likedBy.includes(currentUserId)
+            : false,
+        })),
+        hasMore: res.hasMore,
+      };
+    } catch (err) {
+      return rejectWithValue(err as ApiError);
+    }
+  },
+);
 
 export const createReply = createAsyncThunk<
   PostComment,
-  { postId: string; commentId: string; content: string }
->("comments/createReply", async ({ postId, commentId, content }) => {
-  return await createReplyApi(postId, commentId, content);
+  { postId: string; commentId: string; content: string },
+  { rejectValue: ApiError }
+>("comments/createReply", async (payload, { rejectWithValue }) => {
+  try {
+    return await createReplyApi(
+      payload.postId,
+      payload.commentId,
+      payload.content,
+    );
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
+  }
 });
 
 export const updateComment = createAsyncThunk<
   PostComment,
-  { postId: string; commentId: string; content: string }
->("comments/updateComment", async ({ postId, commentId, content }) => {
-  return await updateCommentApi(postId, commentId, content);
+  { postId: string; commentId: string; content: string },
+  { rejectValue: ApiError }
+>("comments/updateComment", async (payload, { rejectWithValue }) => {
+  try {
+    return await updateCommentApi(
+      payload.postId,
+      payload.commentId,
+      payload.content,
+    );
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
+  }
 });
 
 export const deleteComment = createAsyncThunk<
   void,
-  { postId: string; commentId: string }
->("comments/deleteComment", async ({ postId, commentId }) => {
-  return await deleteCommentApi(postId, commentId);
-});
+  { postId: string; commentId: string },
+  { rejectValue: ApiError }
+>(
+  "comments/deleteComment",
+  async ({ postId, commentId }, { rejectWithValue }) => {
+    try {
+      await deleteCommentApi(postId, commentId);
+    } catch (err) {
+      return rejectWithValue(err as ApiError);
+    }
+  },
+);
 
 const commentSlice = createSlice({
   name: "comments",
@@ -214,7 +261,6 @@ const commentSlice = createSlice({
 
       .addCase(fetchCommentReplies.fulfilled, (state, action) => {
         const { commentId, replies, hasMore } = action.payload;
-        console.log({ commentId, replies, hasMore });
 
         const comment = state.comments.find((c) => c._id === commentId);
         if (!comment) return;

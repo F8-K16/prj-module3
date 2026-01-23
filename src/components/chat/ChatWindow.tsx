@@ -35,7 +35,7 @@ export default function ChatWindow({ variant = "page" }: ChatWindowProps) {
     conversationId: string;
   }>();
   const modalConversationId = useSelector(
-    (state: RootState) => state.modal.conversationId,
+    (state: RootState) => state.modals.conversationId,
   );
 
   const conversationId =
@@ -267,8 +267,7 @@ export default function ChatWindow({ variant = "page" }: ChatWindowProps) {
 
       {/* Messages */}
       <div
-        className="flex-1 overflow-y-auto px-4 py-4  [&::-webkit-scrollbar]:w-2
-        [&::-webkit-scrollbar-track]:rounded-full
+        className="flex-1 overflow-y-auto px-4 py-4 [&::-webkit-scrollbar]:w-2
         [&::-webkit-scrollbar-thumb]:rounded-full
         dark:[&::-webkit-scrollbar-track]:bg-[#2c2c2c]
         dark:[&::-webkit-scrollbar-thumb]:bg-[#9f9f9f]"

@@ -13,6 +13,7 @@ import {
 } from "@/types/auth";
 import { updateProfileApi } from "@/services/userApi";
 import type { User } from "@/types/user";
+import type { ApiError } from "@/types/api";
 
 const initialState: AuthState = {
   user: null,
@@ -31,77 +32,76 @@ const initialState: AuthState = {
 export const login = createAsyncThunk<
   LoginResponse,
   LoginPayload,
-  { rejectValue: string }
+  { rejectValue: ApiError }
 >("auth/login", async (payload, { rejectWithValue }) => {
   try {
     return await loginApi(payload);
   } catch (err) {
-    return rejectWithValue((err as Error).message);
+    return rejectWithValue(err as ApiError);
   }
 });
 
-export const register = createAsyncThunk(
-  "auth/register",
-  async (data: RegisterPayload, { rejectWithValue }) => {
-    try {
-      const res = await registerApi(data);
-      return res;
-    } catch (err) {
-      return rejectWithValue((err as Error).message);
-    }
-  },
-);
+export const register = createAsyncThunk<
+  void,
+  RegisterPayload,
+  { rejectValue: ApiError }
+>("auth/register", async (data, { rejectWithValue }) => {
+  try {
+    await registerApi(data);
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
+  }
+});
 
-export const getProfile = createAsyncThunk<User, void, { rejectValue: string }>(
-  "auth/getProfile",
-  async (_, { rejectWithValue }) => {
-    try {
-      const res = await getProfileApi();
-      return res.data;
-    } catch {
-      return rejectWithValue("UNAUTHORIZED");
-    }
-  },
-);
+export const getProfile = createAsyncThunk<
+  User,
+  void,
+  { rejectValue: ApiError }
+>("auth/getProfile", async (_, { rejectWithValue }) => {
+  try {
+    const res = await getProfileApi();
+    return res.data;
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
+  }
+});
 
 export const updateProfile = createAsyncThunk<
   User,
   FormData,
-  { rejectValue: string }
+  { rejectValue: ApiError }
 >("auth/updateProfile", async (formData, { rejectWithValue }) => {
   try {
-    const res = await updateProfileApi(formData);
-    return res.data;
-  } catch {
-    return rejectWithValue("Update profile failed");
+    return await updateProfileApi(formData);
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
   }
 });
 
-export const logout = createAsyncThunk(
+export const logout = createAsyncThunk<void, void, { rejectValue: ApiError }>(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
       await logoutApi();
     } catch (err) {
-      return rejectWithValue(
-        err instanceof Error ? err.message : "Logout failed",
-      );
+      return rejectWithValue(err as ApiError);
     }
   },
 );
 
-export const initAuth = createAsyncThunk(
-  "auth/init",
+export const initAuth = createAsyncThunk<User, void, { rejectValue: ApiError }>(
+  "auth/initAuth",
   async (_, { dispatch, rejectWithValue }) => {
     const accessToken = localStorage.getItem("access_token");
 
     if (!accessToken) {
-      return rejectWithValue("NO_TOKEN");
+      return rejectWithValue({ message: "NO_TOKEN" });
     }
+
     try {
       return await dispatch(getProfile()).unwrap();
-    } catch {
-      return rejectWithValue("UNAUTHORIZED");
+    } catch (err) {
+      return rejectWithValue(err as ApiError);
     }
   },
 );
@@ -142,7 +142,7 @@ const authSlice = createSlice({
       })
       .addCase(register.rejected, (state, action) => {
         state.registerLoading = false;
-        state.error = action.payload as string;
+        state.error = action.payload?.message ?? "Đăng ký thất bại";
       })
 
       // LOGIN
@@ -165,7 +165,7 @@ const authSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.loginLoading = false;
         state.isInitialized = true;
-        state.error = action.payload ?? "Đăng nhập thất bại";
+        state.error = action.payload?.message ?? "Đăng nhập thất bại";
       })
 
       // GET PROFILE
@@ -187,7 +187,7 @@ const authSlice = createSlice({
       })
       .addCase(updateProfile.rejected, (state, action) => {
         state.updateLoading = false;
-        state.error = action.payload as string;
+        state.error = action.payload?.message ?? "Cập nhật thông tin thất bại";
       })
 
       // LOGOUT

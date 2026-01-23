@@ -1,5 +1,7 @@
+import type { ApiError, ApiErrorResponse } from "@/types/api";
 import type { Conversation } from "@/types/message";
 import type { User } from "@/types/user";
+import { AxiosError } from "axios";
 import { useLocation } from "react-router-dom";
 
 export const markAsFollowing = (users: User[], userId: string) => {
@@ -101,4 +103,20 @@ export function useHideChatUI() {
   const { pathname } = useLocation();
 
   return pathname === "/chat" || pathname.startsWith("/direct");
+}
+
+// Error Api
+export function parseApiError(err: unknown): ApiError {
+  if (err instanceof AxiosError) {
+    return {
+      message:
+        (err.response?.data as ApiErrorResponse | undefined)?.message ??
+        "Đã có lỗi xảy ra.",
+      status: err.response?.status,
+    };
+  }
+
+  return {
+    message: "Lỗi không xác định",
+  };
 }

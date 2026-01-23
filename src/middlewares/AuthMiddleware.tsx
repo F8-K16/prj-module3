@@ -5,7 +5,7 @@ import Loading from "@/utils/loading/Loading";
 
 export default function AuthMiddleware() {
   const { isAuthenticated, isInitialized } = useSelector(
-    (state: RootState) => state.auth
+    (state: RootState) => state.auth,
   );
   const location = useLocation();
 

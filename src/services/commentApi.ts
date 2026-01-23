@@ -1,14 +1,19 @@
 import type { CommentRepliesResponse, PostComment } from "@/types/comment";
 import instance from "@/utils/axios";
+import { parseApiError } from "@/utils/helper";
 
 export const getPostComments = async (
   postId: string,
   limit: number,
 ): Promise<PostComment[]> => {
-  const res = await instance.get(
-    `/api/posts/${postId}/comments?limit=${limit}`,
-  );
-  return res.data.data.comments;
+  try {
+    const res = await instance.get(
+      `/api/posts/${postId}/comments?limit=${limit}`,
+    );
+    return res.data.data.comments;
+  } catch (err) {
+    throw parseApiError(err);
+  }
 };
 
 export const createPostCommentApi = async (
@@ -16,11 +21,15 @@ export const createPostCommentApi = async (
   content: string,
   parentCommentId: string | null = null,
 ): Promise<PostComment> => {
-  const res = await instance.post(`/api/posts/${postId}/comments`, {
-    content,
-    parentCommentId,
-  });
-  return res.data.data;
+  try {
+    const res = await instance.post(`/api/posts/${postId}/comments`, {
+      content,
+      parentCommentId,
+    });
+    return res.data.data;
+  } catch (err) {
+    throw parseApiError(err);
+  }
 };
 
 export const getCommentRepliesApi = async (
@@ -29,14 +38,18 @@ export const getCommentRepliesApi = async (
   limit = 5,
   offset = 0,
 ): Promise<CommentRepliesResponse> => {
-  const res = await instance.get(
-    `/api/posts/${postId}/comments/${commentId}/replies`,
-    {
-      params: { limit, offset },
-    },
-  );
+  try {
+    const res = await instance.get(
+      `/api/posts/${postId}/comments/${commentId}/replies`,
+      {
+        params: { limit, offset },
+      },
+    );
 
-  return res.data.data;
+    return res.data.data;
+  } catch (err) {
+    throw parseApiError(err);
+  }
 };
 
 export const createReplyApi = async (
@@ -44,28 +57,41 @@ export const createReplyApi = async (
   commentId: string,
   content: string,
 ): Promise<PostComment> => {
-  const res = await instance.post(
-    `/api/posts/${postId}/comments/${commentId}/replies`,
-    { content },
-  );
-  return res.data.data;
+  try {
+    const res = await instance.post(
+      `/api/posts/${postId}/comments/${commentId}/replies`,
+      { content },
+    );
+
+    return res.data.data;
+  } catch (err) {
+    throw parseApiError(err);
+  }
 };
 
 export const deleteCommentApi = async (postId: string, commentId: string) => {
-  const res = await instance.delete(
-    `/api/posts/${postId}/comments/${commentId}`,
-  );
-  return res.data;
+  try {
+    const res = await instance.delete(
+      `/api/posts/${postId}/comments/${commentId}`,
+    );
+    return res.data;
+  } catch (err) {
+    throw parseApiError(err);
+  }
 };
 
 export const toggleLikeCommentApi = async (
   postId: string,
   commentId: string,
 ) => {
-  const res = await instance.post(
-    `/api/posts/${postId}/comments/${commentId}/like`,
-  );
-  return res.data.data;
+  try {
+    const res = await instance.post(
+      `/api/posts/${postId}/comments/${commentId}/like`,
+    );
+    return res.data.data;
+  } catch (err) {
+    throw parseApiError(err);
+  }
 };
 
 export const updateCommentApi = async (
@@ -73,9 +99,14 @@ export const updateCommentApi = async (
   commentId: string,
   content: string,
 ) => {
-  const res = await instance.patch(
-    `/api/posts/${postId}/comments/${commentId}`,
-    { content },
-  );
-  return res.data.data;
+  try {
+    const res = await instance.patch(
+      `/api/posts/${postId}/comments/${commentId}`,
+      { content },
+    );
+
+    return res.data.data;
+  } catch (err) {
+    throw parseApiError(err);
+  }
 };

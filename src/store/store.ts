@@ -12,7 +12,7 @@ export const store = configureStore({
   reducer: {
     auth: authSlice,
     posts: postSlice,
-    modal: modalSlice,
+    modals: modalSlice,
     users: userSlice,
     postDetail: postDetailSlice,
     comments: commentSlice,

@@ -13,7 +13,7 @@ import EditPostModal from "./EditPostModal";
 export default function AppModal() {
   const dispatch = useDispatch();
   const { activeModal, postId, userId, parentModal } = useSelector(
-    (state: RootState) => state.modal,
+    (state: RootState) => state.modals,
   );
 
   const shouldOpenPostModal = activeModal === "post" || parentModal === "post";

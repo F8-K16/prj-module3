@@ -64,7 +64,12 @@ export default function FollowerListModal({
       >
         <div className="text-center py-3 border-b font-semibold">{title}</div>
 
-        <div className="max-h-100 overflow-y-auto p-4">
+        <div
+          className="max-h-100 overflow-y-auto p-4 [&::-webkit-scrollbar]:w-2
+        [&::-webkit-scrollbar-thumb]:rounded-full
+        dark:[&::-webkit-scrollbar-track]:bg-[#2c2c2c]
+        dark:[&::-webkit-scrollbar-thumb]:bg-[#9f9f9f]"
+        >
           {userLoading ? (
             <SkeletonLoading count={5} />
           ) : users.length === 0 ? (

@@ -9,7 +9,7 @@ export default function EditCommentModal() {
   const dispatch = useDispatch<AppDispatch>();
 
   const { activeModal, postId, commentId } = useSelector(
-    (state: RootState) => state.modal,
+    (state: RootState) => state.modals,
   );
 
   const comment = useSelector((state: RootState) =>

@@ -309,7 +309,7 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
 
                   {comment.repliesVisible &&
                     comment.replies.map((reply) => (
-                      <div key={reply._id} className="flex gap-3 my-5 group">
+                      <div key={reply._id} className="flex gap-3 my-5">
                         <Link
                           to={`/user/${reply.userId._id}`}
                           onClick={onClose}
@@ -336,20 +336,6 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
                             <span className="text-xs text-[#a2aab4]">
                               {formatTimeAgo(reply.createdAt)}
                             </span>
-                            <button
-                              onClick={() =>
-                                dispatch(
-                                  openCommentOptionsModal({
-                                    postId: post!._id,
-                                    commentId: reply._id,
-                                    ownerId: reply.userId._id,
-                                  }),
-                                )
-                              }
-                              className="ml-3 mt-1 opacity-0 group-hover:opacity-100 transition cursor-pointer"
-                            >
-                              <MoreHorizontal size={18} />
-                            </button>
                           </div>
                         </div>
                       </div>

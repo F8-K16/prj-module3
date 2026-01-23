@@ -22,7 +22,6 @@ export default function ChatModal({ open }: ModalProps) {
   const { conversations, conversationsLoading, currentConversation } =
     useSelector((state: RootState) => state.messages);
   const authUser = useSelector((state: RootState) => state.auth.user);
-  console.log(conversations);
 
   useEffect(() => {
     if (open) {

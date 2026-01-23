@@ -8,6 +8,7 @@ import {
   updatePostCaption,
 } from "./postSlice";
 import type { RootState } from "@/store/store";
+import type { ApiError } from "@/types/api";
 
 const initialState: PostDetailState = {
   post: null,
@@ -17,7 +18,7 @@ const initialState: PostDetailState = {
 export const fetchPostDetail = createAsyncThunk<
   Post,
   string,
-  { state: RootState }
+  { state: RootState; rejectValue: ApiError }
 >(
   "postDetail/fetchPostDetail",
   async (postId, { getState, rejectWithValue }) => {
@@ -30,8 +31,8 @@ export const fetchPostDetail = createAsyncThunk<
         isLiked: currentUserId ? post.likedBy.includes(currentUserId) : false,
         isSaved: currentUserId ? post.savedBy.includes(currentUserId) : false,
       };
-    } catch {
-      return rejectWithValue("Có lỗi khi fetch chi tiết bài viết");
+    } catch (err) {
+      return rejectWithValue(err as ApiError);
     }
   },
 );

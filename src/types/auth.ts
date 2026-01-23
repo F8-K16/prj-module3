@@ -4,13 +4,13 @@ export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isInitialized: boolean;
+  error: string | null;
+  isProfileUpdated: boolean;
 
   loginLoading: boolean;
   registerLoading: boolean;
   authLoading: boolean;
   updateLoading: boolean;
-  error: string | null;
-  isProfileUpdated: boolean;
 }
 
 export interface LoginPayload {

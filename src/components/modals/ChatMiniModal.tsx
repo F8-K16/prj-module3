@@ -10,7 +10,7 @@ export default function ChatMiniModal() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { activeModal, conversationId } = useSelector(
-    (state: RootState) => state.modal,
+    (state: RootState) => state.modals,
   );
   const hide = useHideChatUI();
 

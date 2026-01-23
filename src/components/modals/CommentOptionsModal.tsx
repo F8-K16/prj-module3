@@ -11,7 +11,7 @@ export default function CommentOptionsModal() {
   const didSubmitDeleteRef = useRef<boolean>(false);
 
   const { activeModal, commentOwnerId, commentId, postId } = useSelector(
-    (state: RootState) => state.modal,
+    (state: RootState) => state.modals,
   );
   const { deleteLoading } = useSelector((state: RootState) => state.comments);
   const authUserId = useSelector((state: RootState) => state.auth.user?._id);

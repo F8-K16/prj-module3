@@ -11,6 +11,7 @@ import {
   updatePostCaptionApi,
 } from "@/services/postApi";
 import type { RootState } from "@/store/store";
+import type { ApiError } from "@/types/api";
 
 const initialState: PostState = {
   posts: [],
@@ -24,31 +25,31 @@ const initialState: PostState = {
 export const fetchNewsfeed = createAsyncThunk<
   Post[],
   void,
-  { rejectValue: string }
+  { rejectValue: ApiError }
 >("posts/fetchNewsfeed", async (_, { rejectWithValue }) => {
   try {
     return await getNewsfeed();
-  } catch {
-    return rejectWithValue("Failed to fetch Newfeeds");
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
   }
 });
 
 export const fetchPostsTrending = createAsyncThunk<
   Post[],
   void,
-  { rejectValue: string }
+  { rejectValue: ApiError }
 >("posts/fetchPostsTrending", async (_, { rejectWithValue }) => {
   try {
     return await getPostsTrending();
-  } catch {
-    return rejectWithValue("Failed to fetch post trending");
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
   }
 });
 
 export const createPost = createAsyncThunk<
   Post,
   { file: File; caption?: string },
-  { state: RootState; rejectValue: string }
+  { state: RootState; rejectValue: ApiError }
 >(
   "posts/createPost",
   async ({ file, caption }, { getState, rejectWithValue }) => {
@@ -68,8 +69,8 @@ export const createPost = createAsyncThunk<
       }
 
       return res;
-    } catch {
-      return rejectWithValue("Failed to create new post");
+    } catch (err) {
+      return rejectWithValue(err as ApiError);
     }
   },
 );
@@ -81,7 +82,7 @@ export const updatePostCaption = createAsyncThunk<
     updatedAt: string;
   },
   { postId: string; caption: string },
-  { rejectValue: string }
+  { rejectValue: ApiError }
 >(
   "posts/updatePostCaption",
   async ({ postId, caption }, { rejectWithValue }) => {
@@ -93,59 +94,61 @@ export const updatePostCaption = createAsyncThunk<
         caption: data.caption,
         updatedAt: data.updatedAt,
       };
-    } catch {
-      return rejectWithValue("Failed to update post caption");
+    } catch (err) {
+      return rejectWithValue(err as ApiError);
     }
   },
 );
 
-export const deletePost = createAsyncThunk<string, string>(
-  "posts/deletePost",
-  async (postId, { rejectWithValue }) => {
-    try {
-      await deletePostApi(postId);
-      return postId;
-    } catch {
-      return rejectWithValue("Failed to delete post");
-    }
-  },
-);
+export const deletePost = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: ApiError }
+>("posts/deletePost", async (postId, { rejectWithValue }) => {
+  try {
+    await deletePostApi(postId);
+    return postId;
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
+  }
+});
 
-export const toggleLikePost = createAsyncThunk(
-  "posts/toggleLike",
-  async (postId: string, { rejectWithValue }) => {
-    try {
-      const data = await toggleLikePostApi(postId);
-      return data;
-    } catch {
-      return rejectWithValue("Failed to toggle like post");
-    }
-  },
-);
+export const toggleLikePost = createAsyncThunk<
+  Post,
+  string,
+  { rejectValue: ApiError }
+>("posts/toggleLike", async (postId, { rejectWithValue }) => {
+  try {
+    return await toggleLikePostApi(postId);
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
+  }
+});
 
 export const toggleSavePost = createAsyncThunk<
   Post,
   string,
-  { state: RootState }
+  { state: RootState; rejectValue: ApiError }
 >("posts/toggleSave", async (postId, { getState, rejectWithValue }) => {
   try {
     const state = getState();
-
     const post =
       state.postDetail.post ?? state.posts.posts.find((p) => p._id === postId);
 
-    if (!post) throw new Error("Post not found");
+    if (!post) {
+      throw { message: "Post not found" } as ApiError;
+    }
 
-    const data = post.isSaved
+    const updatedPost = post.isSaved
       ? await unsavePostApi(postId)
       : await savePostApi(postId);
 
     return {
-      ...data,
+      ...updatedPost,
       isSaved: !post.isSaved,
     };
-  } catch {
-    return rejectWithValue("Failed to toggle save post");
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
   }
 });
 
@@ -189,21 +192,14 @@ const postSlice = createSlice({
         const updatedPost = action.payload;
 
         const post = state.posts.find((p) => p._id === updatedPost._id);
-        if (post) {
-          post.likes = updatedPost.likes;
-          post.isLiked = updatedPost.isLiked;
-          post.likedBy = updatedPost.likedBy;
-        }
+        if (post) Object.assign(post, updatedPost);
       })
 
       .addCase(toggleSavePost.fulfilled, (state, action) => {
         const updatedPost = action.payload;
 
         const post = state.posts.find((p) => p._id === updatedPost._id);
-        if (post) {
-          post.isSaved = updatedPost.isSaved;
-          post.savedBy = updatedPost.savedBy;
-        }
+        if (post) Object.assign(post, updatedPost);
       })
 
       /* ===== CREATE POST ===== */

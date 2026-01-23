@@ -12,8 +12,9 @@ import {
   searchUsersApi,
   unfollowUserApi,
 } from "@/services/userApi";
-import type { User, UsersState } from "@/types/user";
+import type { SearchHistory, User, UsersState } from "@/types/user";
 import { markAsFollowing, markAsUnfollowing } from "@/utils/helper";
+import type { ApiError } from "@/types/api";
 
 const initialState: UsersState = {
   suggestedUsers: [],
@@ -33,35 +34,34 @@ type FollowPayload = {
   authUserId: string;
 };
 
-export const fetchProfileById = createAsyncThunk(
-  "users/fetchProfileById",
-  async (userId: string, { rejectWithValue }) => {
-    try {
-      const res = await getProfileById(userId);
-      return res as User;
-    } catch {
-      return rejectWithValue("Fetch profile failed");
-    }
-  },
-);
+export const fetchProfileById = createAsyncThunk<
+  User,
+  string,
+  { rejectValue: ApiError }
+>("users/fetchProfileById", async (userId, { rejectWithValue }) => {
+  try {
+    return await getProfileById(userId);
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
+  }
+});
 
-export const fetchSuggestedUsers = createAsyncThunk(
-  "users/fetchSuggested",
-  async (_, { rejectWithValue }) => {
-    try {
-      const res = await getSuggestedUsersApi();
-      return res.data.data as User[];
-    } catch {
-      return rejectWithValue("Fetch suggested users failed");
-    }
-  },
-);
+export const fetchSuggestedUsers = createAsyncThunk<
+  User[],
+  void,
+  { rejectValue: ApiError }
+>("users/fetchSuggested", async (_, { rejectWithValue }) => {
+  try {
+    return await getSuggestedUsersApi();
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
+  }
+});
 
 export const searchUsers = createAsyncThunk(
   "users/search",
   async (q: string) => {
-    const res = await searchUsersApi(q);
-    return res.data;
+    return await searchUsersApi(q);
   },
 );
 
@@ -74,23 +74,23 @@ export const saveSearchHistory = createAsyncThunk(
     try {
       await saveSearchHistoryApi(data);
       return data;
-    } catch {
-      return rejectWithValue("Save search history failed");
+    } catch (err) {
+      return rejectWithValue(err as ApiError);
     }
   },
 );
 
-export const fetchSearchHistory = createAsyncThunk(
-  "users/fetchSearchHistory",
-  async (_, { rejectWithValue }) => {
-    try {
-      const res = await getSearchHistoryApi();
-      return res.data.data;
-    } catch {
-      return rejectWithValue("Fetch search history failed");
-    }
-  },
-);
+export const fetchSearchHistory = createAsyncThunk<
+  SearchHistory[],
+  void,
+  { rejectValue: ApiError }
+>("users/fetchSearchHistory", async (_, { rejectWithValue }) => {
+  try {
+    return await getSearchHistoryApi();
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
+  }
+});
 
 export const deleteSearchHistoryItem = createAsyncThunk(
   "users/deleteSearchHistoryItem",
@@ -98,8 +98,8 @@ export const deleteSearchHistoryItem = createAsyncThunk(
     try {
       await deleteSearchHistoryItemApi(historyId);
       return historyId;
-    } catch {
-      return rejectWithValue("Delete search history item failed");
+    } catch (err) {
+      return rejectWithValue(err as ApiError);
     }
   },
 );
@@ -110,8 +110,8 @@ export const clearAllSearchHistory = createAsyncThunk(
     try {
       await clearAllSearchHistoryApi();
       return true;
-    } catch {
-      return rejectWithValue("Clear search history failed");
+    } catch (err) {
+      return rejectWithValue(err as ApiError);
     }
   },
 );
@@ -132,29 +132,29 @@ export const unfollowUser = createAsyncThunk<FollowPayload, FollowPayload>(
   },
 );
 
-export const fetchFollowers = createAsyncThunk(
-  "users/fetchFollowers",
-  async (userId: string, { rejectWithValue }) => {
-    try {
-      const res = await getFollowersApi(userId);
-      return res.data.data.followers as User[];
-    } catch {
-      return rejectWithValue("Fetch followers failed");
-    }
-  },
-);
+export const fetchFollowers = createAsyncThunk<
+  User[],
+  string,
+  { rejectValue: ApiError }
+>("users/fetchFollowers", async (userId, { rejectWithValue }) => {
+  try {
+    return await getFollowersApi(userId);
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
+  }
+});
 
-export const fetchFollowing = createAsyncThunk(
-  "users/fetchFollowing",
-  async (userId: string, { rejectWithValue }) => {
-    try {
-      const res = await getFollowingApi(userId);
-      return res.data.data.following as User[];
-    } catch {
-      return rejectWithValue("Fetch following failed");
-    }
-  },
-);
+export const fetchFollowing = createAsyncThunk<
+  User[],
+  string,
+  { rejectValue: ApiError }
+>("users/fetchFollowing", async (userId, { rejectWithValue }) => {
+  try {
+    return await getFollowingApi(userId);
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
+  }
+});
 
 const userSlice = createSlice({
   name: "suggestedUsers",

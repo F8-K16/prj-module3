@@ -9,7 +9,7 @@ export default function EditPostModal() {
   const dispatch = useDispatch<AppDispatch>();
 
   const { activeModal, postId } = useSelector(
-    (state: RootState) => state.modal,
+    (state: RootState) => state.modals,
   );
 
   const post = useSelector((state: RootState) =>

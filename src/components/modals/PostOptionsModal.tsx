@@ -10,7 +10,7 @@ export default function PostOptionsModal() {
   const [confirming, setConfirming] = useState(false);
 
   const { activeModal, ownerId, postId } = useSelector(
-    (state: RootState) => state.modal,
+    (state: RootState) => state.modals,
   );
 
   const { deleteLoading } = useSelector((state: RootState) => state.posts);
