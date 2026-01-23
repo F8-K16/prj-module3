@@ -11,6 +11,11 @@ export interface AuthState {
   registerLoading: boolean;
   authLoading: boolean;
   updateLoading: boolean;
+
+  forgotLoading: boolean;
+  forgotSuccess: boolean;
+  resetLoading: boolean;
+  resetSuccess: boolean;
 }
 
 export interface LoginPayload {

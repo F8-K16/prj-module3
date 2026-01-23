@@ -11,7 +11,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Avatar from "../Avatar";
 import { formatTimeAgo, getOtherUser, useHideChatUI } from "@/utils/helper";
-import SkeletonLoading from "@/utils/loading/SkeletonLoading";
+import { Spinner } from "../ui/spinner";
 
 export default function ChatListModal() {
   const dispatch = useDispatch<AppDispatch>();
@@ -59,8 +59,20 @@ export default function ChatListModal() {
         dark:[&::-webkit-scrollbar-thumb]:bg-[#9f9f9f]"
       >
         {conversationsLoading ? (
-          <div className="ml-6 mt-3">
-            <SkeletonLoading count={6} />
+          <div className="w-4 mx-auto py-6">
+            <Spinner />
+          </div>
+        ) : conversations.length === 0 ? (
+          <div className="flex flex-col items-center justify-center px-6 py-10 text-center text-gray-400">
+            <ImageIcon size={48} className="mb-4 opacity-60" />
+            <p className="text-sm font-medium">Chưa có tin nhắn nào</p>
+            <p className="text-xs mt-1">Hãy bắt đầu trò chuyện với ai đó</p>
+            <button
+              onClick={() => dispatch(openNewMessageModal())}
+              className="mt-4 px-4 py-2 rounded-full bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600"
+            >
+              Tin nhắn mới
+            </button>
           </div>
         ) : (
           conversations.map((conversation) => {

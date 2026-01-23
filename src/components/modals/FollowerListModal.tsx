@@ -35,6 +35,8 @@ export default function FollowerListModal({
   const authUserId = useSelector((state: RootState) => state.auth.user?._id);
 
   const users = type === "followers" ? followers : following;
+  const safeUsers = users.filter((user) => user && user._id && user.username);
+
   const title = type === "followers" ? "Người theo dõi" : "Đang theo dõi";
 
   useEffect(() => {
@@ -72,13 +74,13 @@ export default function FollowerListModal({
         >
           {userLoading ? (
             <SkeletonLoading count={5} />
-          ) : users.length === 0 ? (
+          ) : safeUsers.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-6">
               Danh sách trống
             </p>
           ) : (
             <div className="space-y-4">
-              {users.map((user) => {
+              {safeUsers.map((user) => {
                 const isMe = user._id === authUserId;
                 const isLoading = followLoadingIds.includes(user._id);
                 const isFollowing =

@@ -1,5 +1,9 @@
 import Loading from "@/utils/loading/Loading";
-import { openFollowersModal, openFollowingModal } from "@/features/modalSlice";
+import {
+  openFollowersModal,
+  openFollowingModal,
+  openMiniChat,
+} from "@/features/modalSlice";
 import {
   fetchProfileById,
   followUser,
@@ -19,6 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import Avatar from "@/components/Avatar";
 import { Spinner } from "@/components/ui/spinner";
+import { fetchOrCreateConversation } from "@/features/messageSlice";
 
 type TabType = "posts" | "saved" | "videos";
 
@@ -101,6 +106,18 @@ export default function ProfilePage() {
   if (profileLoading || !user) return <Loading />;
   const isFollowLoading = followLoadingIds.includes(user?._id);
 
+  const handleSendMessage = async () => {
+    try {
+      const conversation = await dispatch(
+        fetchOrCreateConversation(user?._id),
+      ).unwrap();
+
+      dispatch(openMiniChat(conversation._id));
+    } catch (err) {
+      console.error("Không thể mở cuộc trò chuyện:", err);
+    }
+  };
+
   return (
     <div className="w-6xl ml-50 px-4">
       {/* HEADER */}
@@ -113,7 +130,7 @@ export default function ProfilePage() {
 
           <div className="flex gap-4 text-sm">
             <span>
-              <strong>{user.postsCount || 0}</strong> bài viết
+              <strong>{posts.length}</strong> bài viết
             </span>
             <span
               onClick={() => dispatch(openFollowersModal(user._id))}
@@ -199,7 +216,10 @@ export default function ProfilePage() {
             </button>
 
             {user.isFollowing && (
-              <button className="h-11 bg-[#25292e] rounded-xl w-full hover:bg-[#2f3338] cursor-pointer">
+              <button
+                onClick={handleSendMessage}
+                className="h-11 bg-[#25292e] rounded-xl w-full hover:bg-[#2f3338] cursor-pointer"
+              >
                 Gửi tin nhắn
               </button>
             )}

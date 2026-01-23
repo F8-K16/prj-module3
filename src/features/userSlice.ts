@@ -223,25 +223,21 @@ const userSlice = createSlice({
       .addCase(followUser.fulfilled, (state, action) => {
         const { targetUserId, authUserId } = action.payload;
 
-        // 1️⃣ stop loading
         state.followLoadingIds = state.followLoadingIds.filter(
           (id) => id !== targetUserId,
         );
 
-        // 2️⃣ update target user's followers count
         if (state.profileUser?._id === targetUserId) {
           state.profileUser.isFollowing = true;
           state.profileUser.followersCount =
             (state.profileUser.followersCount || 0) + 1;
         }
 
-        // 3️⃣ update auth user's following count (nếu đang xem profile mình)
         if (state.profileUser?._id === authUserId) {
           state.profileUser.followingCount =
             (state.profileUser.followingCount || 0) + 1;
         }
 
-        // 4️⃣ sync all lists
         markAsFollowing(state.suggestedUsers, targetUserId);
         markAsFollowing(state.followers, targetUserId);
 

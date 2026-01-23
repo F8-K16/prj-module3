@@ -19,8 +19,8 @@ export default function NotificationModal({ open, onClose }: ModalProps) {
         <div className="p-6 space-y-6">
           <h2 className="text-xl font-bold">Thông báo</h2>
 
-          <div className="text-sm font-bold">Tháng này</div>
           <div>Thông báo</div>
+          <p>Coming soon...</p>
         </div>
       </div>
     </>

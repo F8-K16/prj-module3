@@ -7,10 +7,22 @@ type AvatarProps = {
 };
 
 export default function Avatar({ src, name, size = 24 }: AvatarProps) {
+  let avatarSrc: string | undefined;
+
   if (src) {
+    if (src.startsWith("blob:")) {
+      avatarSrc = src;
+    } else if (src.startsWith("http")) {
+      avatarSrc = src;
+    } else {
+      avatarSrc = getMediaUrl(src);
+    }
+  }
+
+  if (avatarSrc) {
     return (
       <img
-        src={getMediaUrl(src)}
+        src={avatarSrc}
         alt={name}
         className="rounded-full object-cover"
         style={{ width: size, height: size }}
@@ -20,7 +32,8 @@ export default function Avatar({ src, name, size = 24 }: AvatarProps) {
 
   return (
     <div
-      className="rounded-full bg-[#e4e6eb] text-[#050505] text-[1em] flex items-center justify-center font-semibold"
+      className="rounded-full bg-[#e4e6eb] text-[#050505] text-[1em]
+      flex items-center justify-center font-semibold"
       style={{ width: size, height: size }}
     >
       {name?.charAt(0).toUpperCase()}

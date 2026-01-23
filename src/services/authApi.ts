@@ -94,3 +94,19 @@ export const logoutApi = async () => {
     throw parseApiError(err);
   }
 };
+
+/* ================= RESET PASSWORD ================= */
+export const forgotPasswordApi = (email: string) => {
+  return instance.post(`/api/auth/forgot-password`, { email });
+};
+
+export const resetPasswordApi = (
+  token: string,
+  password: string,
+  confirmPassword: string,
+) => {
+  return instance.post(`/api/auth/reset-password/${token}`, {
+    password,
+    confirmPassword,
+  });
+};

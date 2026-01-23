@@ -30,6 +30,10 @@ export default function NewMessageModal({ open, onClose }: ModalProps) {
   const { searchResult, searchLoading, searchHistory } = useSelector(
     (state: RootState) => state.users,
   );
+  const authUserId = useSelector((state: RootState) => state.auth.user?._id);
+  const filteredSearchResult = searchResult.filter(
+    (user) => user._id !== authUserId,
+  );
 
   const [keyword, setKeyword] = useState("");
   const [selectingUserId, setSelectingUserId] = useState<string | null>(null);
@@ -100,7 +104,7 @@ export default function NewMessageModal({ open, onClose }: ModalProps) {
           )}
 
           {!searchLoading &&
-            searchResult.map((user) => (
+            filteredSearchResult.map((user) => (
               <div
                 key={user._id}
                 onClick={() => handleSelectUser(user._id)}

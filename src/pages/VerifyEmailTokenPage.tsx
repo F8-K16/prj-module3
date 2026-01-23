@@ -53,7 +53,7 @@ export default function VerifyEmailTokenPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0c1014]">
-      <div className="w-full max-w-md bg-[#25292e] text-[#f5f5f5] rounded-lg px-4 py-10 text-center space-y-4">
+      <div className="w-full max-w-md bg-[#25292e] text-[#f5f5f5] rounded-lg px-20 py-10 text-center space-y-4">
         <img
           src="/icons/logo.svg"
           alt="Instagram"

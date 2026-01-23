@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 export default function ExplorePage() {
   const dispatch = useDispatch<AppDispatch>();
   const { posts, postLoading } = useSelector((state: RootState) => state.posts);
+  console.log(posts);
 
   useEffect(() => {
     dispatch(fetchPostsTrending());

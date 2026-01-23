@@ -192,14 +192,24 @@ const postSlice = createSlice({
         const updatedPost = action.payload;
 
         const post = state.posts.find((p) => p._id === updatedPost._id);
-        if (post) Object.assign(post, updatedPost);
+        if (post) {
+          Object.assign(post, {
+            ...updatedPost,
+            userId: post.userId,
+          });
+        }
       })
 
       .addCase(toggleSavePost.fulfilled, (state, action) => {
         const updatedPost = action.payload;
 
         const post = state.posts.find((p) => p._id === updatedPost._id);
-        if (post) Object.assign(post, updatedPost);
+        if (post) {
+          Object.assign(post, {
+            ...updatedPost,
+            userId: post.userId,
+          });
+        }
       })
 
       /* ===== CREATE POST ===== */

@@ -4,6 +4,8 @@ import {
   logoutApi,
   getProfileApi,
   registerApi,
+  forgotPasswordApi,
+  resetPasswordApi,
 } from "@/services/authApi";
 import {
   type LoginResponse,
@@ -27,6 +29,11 @@ const initialState: AuthState = {
   loginLoading: false,
   registerLoading: false,
   updateLoading: false,
+
+  forgotLoading: false,
+  forgotSuccess: false,
+  resetLoading: false,
+  resetSuccess: false,
 };
 
 export const login = createAsyncThunk<
@@ -105,6 +112,36 @@ export const initAuth = createAsyncThunk<User, void, { rejectValue: ApiError }>(
     }
   },
 );
+
+export const forgotPassword = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: ApiError }
+>("auth/forgotPassword", async (email, { rejectWithValue }) => {
+  try {
+    const res = await forgotPasswordApi(email);
+    return res.data.message;
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
+  }
+});
+
+export const resetPassword = createAsyncThunk<
+  string,
+  { token: string; password: string; confirmPassword: string },
+  { rejectValue: ApiError }
+>("auth/resetPassword", async (data, { rejectWithValue }) => {
+  try {
+    const res = await resetPasswordApi(
+      data.token,
+      data.password,
+      data.confirmPassword,
+    );
+    return res.data.message;
+  } catch (err) {
+    return rejectWithValue(err as ApiError);
+  }
+});
 
 const authSlice = createSlice({
   name: "auth",
@@ -209,6 +246,35 @@ const authSlice = createSlice({
 
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
+      })
+
+      // RESET PASSWORD
+      .addCase(forgotPassword.pending, (state) => {
+        state.forgotLoading = true;
+        state.error = null;
+        state.forgotSuccess = false;
+      })
+      .addCase(forgotPassword.fulfilled, (state) => {
+        state.forgotLoading = false;
+        state.forgotSuccess = true;
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.forgotLoading = false;
+        state.error = action.payload?.message || "Có lỗi xảy ra";
+      })
+
+      .addCase(resetPassword.pending, (state) => {
+        state.resetLoading = true;
+        state.error = null;
+        state.resetSuccess = false;
+      })
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.resetLoading = false;
+        state.resetSuccess = true;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.resetLoading = false;
+        state.error = action.payload?.message || "Reset mật khẩu thất bại";
       });
   },
 });

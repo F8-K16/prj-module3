@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import Avatar from "../Avatar";
 import type { Conversation } from "@/types/message";
 import { formatTimeAgo, getOtherUser } from "@/utils/helper";
-import { Spinner } from "../ui/spinner";
+import SkeletonLoading from "@/utils/loading/SkeletonLoading";
 
 export default function ChatModal({ open }: ModalProps) {
   const dispatch = useDispatch<AppDispatch>();
@@ -60,13 +60,22 @@ export default function ChatModal({ open }: ModalProps) {
       <div className="font-semibold mb-2 px-6">Tin nhắn</div>
 
       <div className="space-y-2">
-        {conversationsLoading && (
+        {conversationsLoading ? (
           <div className="ml-6 mt-3">
-            <Spinner />
+            <SkeletonLoading count={6} />
           </div>
-        )}
-
-        {!conversationsLoading &&
+        ) : conversations.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400">
+            <ImageIcon size={40} className="mb-3 opacity-60" />
+            <p className="text-sm">Bạn chưa có cuộc trò chuyện nào</p>
+            <button
+              onClick={() => dispatch(openNewMessageModal())}
+              className="mt-3 text-sm font-semibold text-blue-500 hover:underline"
+            >
+              Bắt đầu trò chuyện
+            </button>
+          </div>
+        ) : (
           conversations.map((conversation: Conversation) => {
             const otherUser = getOtherUser(conversation, authUser._id);
             const isActive = currentConversation?._id === conversation._id;
@@ -134,7 +143,8 @@ export default function ChatModal({ open }: ModalProps) {
                 )}
               </div>
             );
-          })}
+          })
+        )}
       </div>
     </div>
   );

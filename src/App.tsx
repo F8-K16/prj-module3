@@ -18,6 +18,8 @@ import InfoPage from "./pages/InfoPage";
 import ChatDetailPage from "./pages/ChatDetailPage";
 
 import { useChatSocket } from "./hooks/useChatSocket";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 export default function App() {
   const dispatch = useDispatch<AppDispatch>();
@@ -40,6 +42,8 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route path="/verify-email/:token" element={<VerifyEmailTokenPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
         <Route element={<AuthMiddleware />}>
           <Route element={<MainLayout />}>
