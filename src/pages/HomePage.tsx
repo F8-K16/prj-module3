@@ -31,7 +31,6 @@ import { formatTimeAgo, getMediaUrl } from "@/utils/helper";
 export default function HomePage() {
   const dispatch = useDispatch<AppDispatch>();
   const { posts, postLoading } = useSelector((state: RootState) => state.posts);
-  console.log(posts);
 
   const user = useSelector((state: RootState) => state.auth.user);
 

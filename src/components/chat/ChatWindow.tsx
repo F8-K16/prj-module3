@@ -251,13 +251,17 @@ export default function ChatWindow({ variant = "page" }: ChatWindowProps) {
         </Link>
 
         <div className="ml-3">
-          <p className="font-semibold text-[#f5f5f5]">{otherUser?.fullName}</p>
+          <p className="font-semibold dark:text-[#f5f5f5] text-[#0c1014]">
+            {otherUser?.fullName}
+          </p>
           {variant === "page" && (
-            <p className="text-xs text-[#a8a8a8]">{otherUser?.username}</p>
+            <p className="text-xs dark:text-[#a8a8a8] text-[#6a717a]">
+              {otherUser?.username}
+            </p>
           )}
         </div>
         {variant === "page" && (
-          <div className="flex items-center ml-auto gap-5">
+          <div className="flex items-center ml-auto gap-5 text-foreground">
             <Phone />
             <Video />
             <Info />
@@ -312,7 +316,7 @@ export default function ChatWindow({ variant = "page" }: ChatWindowProps) {
 
                     <div
                       className={`text-[15px] rounded-2xl ${msg.messageType === "text" && `px-3 py-2`} 
-                    ${isMe ? "bg-[#4a5df9]" : "bg-[#25292e]"}
+                    ${isMe ? "bg-[#4a5df9]" : "text-[#0c1014] dark:text-[#f5f5f5] dark:bg-[#25292e]"}
                   `}
                     >
                       {msg.messageType === "text" && msg.content}
@@ -380,7 +384,7 @@ export default function ChatWindow({ variant = "page" }: ChatWindowProps) {
 
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="mb-1"
+            className="mb-1 cursor-pointer"
           >
             <img src="/icons/picture.svg" alt="" className="w-7 h-7" />
           </button>
@@ -402,7 +406,7 @@ export default function ChatWindow({ variant = "page" }: ChatWindowProps) {
                     setSelectedImage(null);
                     setImagePreview(null);
                   }}
-                  className="absolute -top-2 -right-2 w-6 h-6 bg-black/70 text-white text-xs rounded-full flex items-center justify-center"
+                  className="absolute -top-2 -right-2 w-6 h-6 bg-black/70 text-white text-xs rounded-full flex items-center justify-center cursor-pointer"
                 >
                   ✕
                 </button>
@@ -418,7 +422,7 @@ export default function ChatWindow({ variant = "page" }: ChatWindowProps) {
                   handleTyping();
                 }}
                 placeholder="Nhập tin nhắn..."
-                className="flex-1 bg-transparent text-sm outline-none px-1"
+                className="flex-1 bg-transparent text-sm outline-none px-1 text-[#0c1014] dark:text-[#f5f5f5]"
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
               />
 
