@@ -10,7 +10,6 @@ import { useDispatch, useSelector } from "react-redux";
 export default function ExplorePage() {
   const dispatch = useDispatch<AppDispatch>();
   const { posts, postLoading } = useSelector((state: RootState) => state.posts);
-  console.log(posts);
 
   useEffect(() => {
     dispatch(fetchPostsTrending());
@@ -24,7 +23,7 @@ export default function ExplorePage() {
         <div
           onClick={() => dispatch(openPostModal(post._id))}
           key={post._id}
-          className="h-77 bg-black overflow-hidden cursor-pointer"
+          className="h-77 dark:bg-black overflow-hidden cursor-pointer"
         >
           {post.mediaType === "image" && (
             <div className="relative h-full">

@@ -11,7 +11,6 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "./store/store";
 import { useEffect } from "react";
 import { initAuth } from "./features/authSlice";
-import Loading from "./utils/loading/Loading";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
 import VerifyEmailTokenPage from "./pages/VerifyEmailTokenPage";
 import InfoPage from "./pages/InfoPage";
@@ -23,9 +22,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 export default function App() {
   const dispatch = useDispatch<AppDispatch>();
-  const { authLoading, isAuthenticated } = useSelector(
-    (state: RootState) => state.auth,
-  );
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     dispatch(initAuth());
@@ -33,9 +30,6 @@ export default function App() {
 
   useChatSocket(isAuthenticated);
 
-  if (authLoading) {
-    return <Loading />;
-  }
   return (
     <>
       <Routes>

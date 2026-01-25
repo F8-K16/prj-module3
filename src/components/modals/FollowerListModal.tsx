@@ -58,11 +58,11 @@ export default function FollowerListModal({
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 bg-black/70 flex justify-center items-center"
+      className="fixed inset-0 z-50 dark:bg-black/70 flex justify-center items-center"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#262626] w-140 rounded-xl overflow-hidden"
+        className="bg-gray-600 dark:bg-[#262626] w-140 rounded-xl overflow-hidden"
       >
         <div className="text-center py-3 border-b font-semibold">{title}</div>
 
@@ -75,7 +75,7 @@ export default function FollowerListModal({
           {userLoading ? (
             <SkeletonLoading count={5} />
           ) : safeUsers.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-6">
+            <p className="text-sm text-[#6a717a] dark:text-gray-400 text-center py-6">
               Danh sách trống
             </p>
           ) : (
@@ -127,7 +127,7 @@ export default function FollowerListModal({
                         }
                         className={`py-1.5 px-5 rounded-lg text-sm font-semibold transition cursor-pointer ${
                           isFollowing
-                            ? "bg-[#25292e] hover:bg-[#333]/80"
+                            ? "bg-white hover:bg-white/70 dark:bg-[#25292e] dark:hover:bg-[#333]/80"
                             : "bg-[#4a5df9] hover:bg-[#4a5df9]/80"
                         }`}
                       >

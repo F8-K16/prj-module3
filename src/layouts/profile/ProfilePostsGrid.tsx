@@ -20,7 +20,7 @@ export default function ProfilePostsGrid({ posts }: { posts: Post[] }) {
         <div
           onClick={() => dispatch(openPostModal(post._id))}
           key={post._id}
-          className="h-77 bg-black overflow-hidden cursor-pointer"
+          className="h-77 overflow-hidden cursor-pointer"
         >
           {post.mediaType === "image" && post.image && (
             <div className="relative h-full">

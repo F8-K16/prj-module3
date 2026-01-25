@@ -115,7 +115,7 @@ export default function ChatWindow({ variant = "page" }: ChatWindowProps) {
 
       setContent("");
     } catch (err) {
-      console.error("Send message failed:", err);
+      console.error("Gửi tin nhắn thất bại:", err);
     } finally {
       setSending(false);
     }

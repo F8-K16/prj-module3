@@ -69,7 +69,7 @@ export default function NewMessageModal({ open, onClose }: ModalProps) {
       onClose();
       navigate(`/direct/${conversation._id}`);
     } catch (err) {
-      console.error("Create conversation failed:", err);
+      console.error("Không thể mở cuộc trò chuyện:", err);
     } finally {
       setSelectingUserId(null);
     }
@@ -77,7 +77,7 @@ export default function NewMessageModal({ open, onClose }: ModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-137 min-h-105 p-0 gap-0 bg-[#212328] text-white border-none flex flex-col">
+      <DialogContent className="max-w-137 min-h-105 p-0 gap-0 dark:bg-[#212328] border-none flex flex-col">
         <DialogHeader className="px-4 pt-4 pb-3 border-b border-[#363636]">
           <DialogTitle className="text-center">Tin nhắn mới</DialogTitle>
           <DialogDescription />
@@ -85,7 +85,7 @@ export default function NewMessageModal({ open, onClose }: ModalProps) {
 
         {/* Search input */}
         <div className="flex items-center gap-4 px-4 py-3 border-b border-[#363636]">
-          <label className="font-semibold text-[#f5f5f5]">Tới:</label>
+          <label className="font-semibold">Tới:</label>
           <input
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
@@ -121,7 +121,9 @@ export default function NewMessageModal({ open, onClose }: ModalProps) {
                 />
                 <div>
                   <p className="text-sm font-medium">{user.username}</p>
-                  <p className="text-xs text-[#a8a8a8]">{user.fullName}</p>
+                  <p className="text-xs text-[#67a17a] dark:text-[#a8a8a8]">
+                    {user.fullName}
+                  </p>
                 </div>
               </div>
             ))}
@@ -136,15 +138,13 @@ export default function NewMessageModal({ open, onClose }: ModalProps) {
         {!keyword && searchHistory.length > 0 && (
           <>
             <div className="flex items-center justify-between">
-              <p className="ml-4 text-[#f5f5f5] text-sm font-semibold my-3">
-                Gợi ý
-              </p>
+              <p className="ml-4 text-sm font-semibold my-3">Gợi ý</p>
             </div>
             {searchHistory.map((item) => (
               <div
                 onClick={() => handleSelectUser(item.searchedUserId._id)}
                 key={item._id}
-                className="flex items-center justify-between px-4 py-2 hover:bg-[#333] cursor-pointer
+                className="flex items-center justify-between px-4 py-2 dark:hover:bg-[#333] cursor-pointer
 "
               >
                 <div className="flex items-center gap-3">

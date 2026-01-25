@@ -12,6 +12,7 @@ import {
 } from "@/services/postApi";
 import type { RootState } from "@/store/store";
 import type { ApiError } from "@/types/api";
+import { normalizePost } from "@/utils/helper";
 
 const initialState: PostState = {
   posts: [],
@@ -167,8 +168,7 @@ const postSlice = createSlice({
         state.postLoading = true;
       })
       .addCase(fetchNewsfeed.fulfilled, (state, action) => {
-        state.posts = action.payload;
-
+        state.posts = action.payload.map(normalizePost);
         state.postLoading = false;
       })
       .addCase(fetchNewsfeed.rejected, (state) => {
@@ -180,7 +180,7 @@ const postSlice = createSlice({
         state.postLoading = true;
       })
       .addCase(fetchPostsTrending.fulfilled, (state, action) => {
-        state.posts = action.payload;
+        state.posts = action.payload.map(normalizePost);
         state.postLoading = false;
       })
       .addCase(fetchPostsTrending.rejected, (state) => {
@@ -189,7 +189,7 @@ const postSlice = createSlice({
 
       /* ===== LIKE POST ===== */
       .addCase(toggleLikePost.fulfilled, (state, action) => {
-        const updatedPost = action.payload;
+        const updatedPost = normalizePost(action.payload);
 
         const post = state.posts.find((p) => p._id === updatedPost._id);
         if (post) {

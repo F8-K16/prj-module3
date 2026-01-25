@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-[#0c1014]">
+    <div className="fixed inset-0 flex items-center justify-center dark:bg-[#0c1014]">
       <img
         src="/icons/favicon.png"
         alt="Instagram"

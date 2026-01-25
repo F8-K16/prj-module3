@@ -37,12 +37,17 @@ export default function ChatModal({ open }: ModalProps) {
 
   if (!open || !authUser) return null;
 
+  const validConversations = conversations.filter((conversation) => {
+    const otherUser = getOtherUser(conversation, authUser?._id);
+    return Boolean(otherUser);
+  });
+
   return (
     <div className="fixed top-0 left-20 h-full w-100 z-50 border-r border-[#dbdfe4] shadow-2xl dark:border-[#262626] dark:border-l animate-in fade-in bg-white dark:bg-[#0c1014]">
       <div className="p-5 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <span className="text-xl font-semibold">{authUser.username}</span>
+          <span className="text-xl font-bold">{authUser.username}</span>
           <button
             className="cursor-pointer hover:opacity-70"
             onClick={() => dispatch(openNewMessageModal())}
@@ -64,7 +69,7 @@ export default function ChatModal({ open }: ModalProps) {
           <div className="ml-6 mt-3">
             <SkeletonLoading count={6} />
           </div>
-        ) : conversations.length === 0 ? (
+        ) : validConversations.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400">
             <ImageIcon size={40} className="mb-3 opacity-60" />
             <p className="text-sm">Bạn chưa có cuộc trò chuyện nào</p>
@@ -76,7 +81,7 @@ export default function ChatModal({ open }: ModalProps) {
             </button>
           </div>
         ) : (
-          conversations.map((conversation: Conversation) => {
+          validConversations.map((conversation: Conversation) => {
             const otherUser = getOtherUser(conversation, authUser._id);
             const isActive = currentConversation?._id === conversation._id;
 
@@ -102,7 +107,7 @@ export default function ChatModal({ open }: ModalProps) {
                   </p>
 
                   <div className="flex gap-1">
-                    <p className="flex gap-1.5 text-xs text-[#a8a8a8] truncate">
+                    <p className="flex gap-1.5 text-xs text-[#6a717a] dark:text-[#a8a8a8] truncate">
                       {conversation.lastMessage ? (
                         <>
                           {conversation.lastMessage.senderId ===
@@ -124,7 +129,7 @@ export default function ChatModal({ open }: ModalProps) {
                       )}
                     </p>
                     {conversation.lastMessageAt && (
-                      <span className="text-xs text-[#a8a8a8] whitespace-nowrap">
+                      <span className="text-xs text-[#6a717a] dark:text-[#a8a8a8] whitespace-nowrap">
                         · {formatTimeAgo(conversation.lastMessageAt)}
                       </span>
                     )}

@@ -93,7 +93,6 @@ export const getFollowingApi = async (userId: string): Promise<User[]> => {
         following: User[];
       };
     }>(`/api/follow/${userId}/following`);
-    console.log(res);
 
     return res.data.data.following;
   } catch (err) {

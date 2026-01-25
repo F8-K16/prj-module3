@@ -23,7 +23,7 @@ export default function ChatEntryButton() {
   return (
     <button
       onClick={() => dispatch(openChatListModal())}
-      className="fixed right-10 bottom-10 flex items-center gap-3 px-5 h-14 rounded-full bg-[#212328] hover:bg-[#212328]/50 cursor-pointer"
+      className="fixed right-10 bottom-10 flex items-center gap-3 px-5 h-14 rounded-full dark:bg-[#212328] dark:hover:bg-[#212328]/50 cursor-pointer shadow-2xl"
     >
       <Send size={24} />
 

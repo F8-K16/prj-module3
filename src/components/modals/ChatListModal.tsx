@@ -32,6 +32,11 @@ export default function ChatListModal() {
 
   if (!open || !authUser || hide) return null;
 
+  const validConversations = conversations.filter((conversation) => {
+    const otherUser = getOtherUser(conversation, authUser?._id);
+    return Boolean(otherUser);
+  });
+
   return (
     <div className="fixed bottom-10 right-10 w-90 max-h-130 bg-white dark:bg-[#212328] rounded-xl shadow-2xl z-50 flex flex-col ">
       <div className="flex items-center justify-between p-4 border-b border-[#363636]">
@@ -62,7 +67,7 @@ export default function ChatListModal() {
           <div className="w-4 mx-auto py-6">
             <Spinner />
           </div>
-        ) : conversations.length === 0 ? (
+        ) : validConversations.length === 0 ? (
           <div className="flex flex-col items-center justify-center px-6 py-10 text-center text-gray-400">
             <ImageIcon size={48} className="mb-4 opacity-60" />
             <p className="text-sm font-medium">Chưa có tin nhắn nào</p>
@@ -75,7 +80,7 @@ export default function ChatListModal() {
             </button>
           </div>
         ) : (
-          conversations.map((conversation) => {
+          validConversations.map((conversation) => {
             const otherUser = getOtherUser(conversation, authUser._id);
 
             return (

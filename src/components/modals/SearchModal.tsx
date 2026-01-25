@@ -110,12 +110,10 @@ export default function SearchModal({ open, onClose }: ModalProps) {
         {!keyword && searchHistory.length > 0 && (
           <>
             <div className="flex items-center justify-between">
-              <p className="px-6 text-[#f5f5f5] font-semibold mt-2 mb-4">
-                Mới đây
-              </p>
+              <p className="px-6  font-semibold mt-2 mb-4">Mới đây</p>
               <button
                 onClick={() => dispatch(clearAllSearchHistory())}
-                className="mr-6 text-[#85a1ff] font-semibold text-sm cursor-pointer hover:underline"
+                className="mr-6 text-[#3143e3] dark:text-[#85a1ff] font-semibold text-sm cursor-pointer hover:underline"
               >
                 Xóa tất cả
               </button>
@@ -150,7 +148,7 @@ export default function SearchModal({ open, onClose }: ModalProps) {
                     e.stopPropagation();
                     dispatch(deleteSearchHistoryItem(item._id));
                   }}
-                  className="text-gray-400 cursor-pointer hover:scale-105 hover:text-white transition"
+                  className="cursor-pointer hover:scale-105 transition"
                 >
                   <X size={20} />
                 </button>

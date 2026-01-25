@@ -1,5 +1,6 @@
 import type { ApiError, ApiErrorResponse } from "@/types/api";
 import type { Conversation } from "@/types/message";
+import type { Post } from "@/types/post";
 import type { User } from "@/types/user";
 import { AxiosError } from "axios";
 import { useLocation } from "react-router-dom";
@@ -120,3 +121,8 @@ export function parseApiError(err: unknown): ApiError {
     message: "Lỗi không xác định",
   };
 }
+
+export const normalizePost = (post: Post): Post => ({
+  ...post,
+  likes: Math.max(0, post.likes ?? 0),
+});

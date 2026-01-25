@@ -11,7 +11,7 @@ export default function ChatPage() {
       <div className="absolute left-[50%] top-[50%] -translate-x-[50%] -translate-y-[50%] text-center">
         <MessageCircleMore size={96} className="mx-auto" />
         <h2 className="mt-4 text-xl">Tin nhắn của bạn</h2>
-        <p className="text-[#a8a8a8] text-sm">
+        <p className="text-[#6a717a] dark:text-[#a8a8a8] text-sm">
           Gửi ảnh và tin nhắn riêng tư cho bạn bè hoặc nhóm
         </p>
         <button

@@ -46,7 +46,9 @@ function TabButton({
     <button
       onClick={onClick}
       className={`flex items-center gap-2 px-5 py-2 border-b-2 cursor-pointer ${
-        active ? "border-white text-white" : "border-transparent text-gray-500"
+        active
+          ? "border-black dark:border-white dark:text-white"
+          : "border-transparent text-gray-500"
       }`}
     >
       {icon}
@@ -168,12 +170,12 @@ export default function ProfilePage() {
           <>
             <Link
               to="/profile"
-              className="h-11 bg-[#25292e] rounded-xl w-full hover:bg-[#2f3338] flex items-center justify-center"
+              className="h-11 dark:bg-[#25292e] rounded-xl w-full dark:hover:bg-[#2f3338] flex items-center justify-center"
             >
               Chỉnh sửa trang cá nhân
             </Link>
 
-            <button className="h-11 bg-[#25292e] rounded-xl w-full hover:bg-[#2f3338]">
+            <button className="h-11 dark:bg-[#25292e] rounded-xl w-full dark:hover:bg-[#2f3338]">
               Xem kho lưu trữ
             </button>
           </>
@@ -200,7 +202,7 @@ export default function ProfilePage() {
           h-11 rounded-xl w-full flex items-center justify-center gap-2 transition
           ${
             user.isFollowing
-              ? "bg-[#25292e] hover:bg-[#2f3338]"
+              ? "dark:bg-[#25292e] dark:hover:bg-[#2f3338]"
               : "bg-blue-500 hover:bg-blue-600 text-white"
           }
           ${isFollowLoading ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}
@@ -218,7 +220,7 @@ export default function ProfilePage() {
             {user.isFollowing && (
               <button
                 onClick={handleSendMessage}
-                className="h-11 bg-[#25292e] rounded-xl w-full hover:bg-[#2f3338] cursor-pointer"
+                className="h-11 dark:bg-[#25292e] rounded-xl w-full dark:hover:bg-[#2f3338] cursor-pointer"
               >
                 Gửi tin nhắn
               </button>

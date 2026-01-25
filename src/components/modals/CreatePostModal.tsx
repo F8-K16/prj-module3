@@ -90,7 +90,7 @@ export default function CreatePostModal({ open, onClose }: ModalProps) {
         }
       }}
     >
-      <DialogContent className="max-w-172 h-160 p-0 bg-[#212328] text-white border-none flex flex-col gap-0">
+      <DialogContent className="max-w-172 h-160 p-0 dark:bg-[#212328]  border-none flex flex-col gap-0">
         <DialogHeader className="h-14 flex gap-0 items-center justify-center border-b border-[#363636]">
           <DialogTitle className="font-semibold">Tạo bài viết mới</DialogTitle>
           <DialogDescription />
