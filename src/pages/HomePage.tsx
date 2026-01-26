@@ -11,7 +11,7 @@ import {
   MoreHorizontal,
   Send,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { openPostModal, openPostOptionsModal } from "@/features/modalSlice";
 import type { AppDispatch, RootState } from "@/store/store";
@@ -30,16 +30,37 @@ import { formatTimeAgo, getMediaUrl } from "@/utils/helper";
 
 export default function HomePage() {
   const dispatch = useDispatch<AppDispatch>();
-  const { posts, postLoading } = useSelector((state: RootState) => state.posts);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+  const { posts, postLoading, hasMore, isFirstLoad } = useSelector(
+    (state: RootState) => state.posts,
+  );
 
   const user = useSelector((state: RootState) => state.auth.user);
+
+  useEffect(() => {
+    if (!loadMoreRef.current || postLoading || !hasMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          dispatch(fetchNewsfeed());
+        }
+      },
+      { threshold: 1 },
+    );
+
+    observer.observe(loadMoreRef.current);
+
+    return () => observer.disconnect();
+  }, [dispatch, postLoading, hasMore]);
 
   useEffect(() => {
     dispatch(fetchNewsfeed());
     dispatch(fetchSuggestedUsers());
   }, [dispatch]);
 
-  if (postLoading) return <Loading />;
+  if (isFirstLoad && postLoading) return <Loading />;
 
   return (
     <div className="flex ml-80">
@@ -170,6 +191,7 @@ export default function HomePage() {
               </Card>
             );
           })}
+        <div ref={loadMoreRef} className="h-10" />
       </div>
       <div className="ml-36 w-78.75">
         <div className="flex items-center gap-3">

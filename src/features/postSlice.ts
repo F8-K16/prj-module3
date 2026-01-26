@@ -20,15 +20,31 @@ const initialState: PostState = {
   updateLoading: false,
   deleteLoading: false,
   deletedPostId: null,
+  hasMore: true,
+  offset: 0,
+  limit: 20,
+  isFirstLoad: true,
 };
 
 export const fetchNewsfeed = createAsyncThunk<
-  Post[],
+  {
+    posts: Post[];
+    hasMore: boolean;
+    offset: number;
+  },
   void,
-  { rejectValue: ApiError }
->("posts/fetchNewsfeed", async (_, { rejectWithValue }) => {
+  { state: RootState; rejectValue: ApiError }
+>("posts/fetchNewsfeed", async (_, { getState, rejectWithValue }) => {
   try {
-    return await getNewsfeed();
+    const { offset, limit } = getState().posts;
+
+    const res = await getNewsfeed(offset, limit);
+
+    return {
+      posts: res.posts,
+      hasMore: res.hasMore,
+      offset: offset + res.posts.length,
+    };
   } catch (err) {
     return rejectWithValue(err as ApiError);
   }
@@ -164,14 +180,26 @@ const postSlice = createSlice({
     builder
       /* ===== FETCH NEWFEEDS ===== */
       .addCase(fetchNewsfeed.pending, (state) => {
-        state.postLoading = true;
+        if (state.isFirstLoad) {
+          state.postLoading = true;
+        }
       })
       .addCase(fetchNewsfeed.fulfilled, (state, action) => {
-        state.posts = action.payload;
+        const existingIds = new Set(state.posts.map((p) => p._id));
+
+        const newPosts = action.payload.posts.filter(
+          (p) => !existingIds.has(p._id),
+        );
+
+        state.posts.push(...newPosts);
+        state.hasMore = action.payload.hasMore;
+        state.offset = action.payload.offset;
         state.postLoading = false;
+        state.isFirstLoad = false;
       })
       .addCase(fetchNewsfeed.rejected, (state) => {
         state.postLoading = false;
+        state.isFirstLoad = false;
       })
 
       /* ===== FETCH EXPLORE POSTS ===== */

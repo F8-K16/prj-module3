@@ -3,13 +3,18 @@ import instance from "@/utils/axios";
 import { parseApiError } from "@/utils/helper";
 
 /* ================= FEED ================= */
-export const getNewsfeed = async (): Promise<Post[]> => {
-  try {
-    const res = await instance.get("/api/posts/feed");
-    return res.data.data.posts;
-  } catch (err) {
-    throw parseApiError(err);
-  }
+export const getNewsfeed = async (
+  offset = 0,
+  limit = 20,
+): Promise<{
+  posts: Post[];
+  hasMore: boolean;
+}> => {
+  const res = await instance.get("/api/posts/feed", {
+    params: { offset, limit },
+  });
+
+  return res.data.data;
 };
 
 export const getPostsTrending = async (): Promise<Post[]> => {
