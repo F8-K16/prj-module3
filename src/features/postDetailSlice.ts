@@ -9,7 +9,6 @@ import {
 } from "./postSlice";
 import type { RootState } from "@/store/store";
 import type { ApiError } from "@/types/api";
-import { normalizePost } from "@/utils/helper";
 
 const initialState: PostDetailState = {
   post: null,
@@ -53,7 +52,7 @@ const postDetailSlice = createSlice({
         state.postDetailLoading = true;
       })
       .addCase(fetchPostDetail.fulfilled, (state, action) => {
-        state.post = normalizePost(action.payload);
+        state.post = action.payload;
         state.postDetailLoading = false;
       })
       .addCase(fetchPostDetail.rejected, (state) => {
@@ -69,10 +68,9 @@ const postDetailSlice = createSlice({
       .addCase(toggleLikePost.fulfilled, (state, action) => {
         if (!state.post) return;
         if (state.post._id === action.payload._id) {
-          const normalized = normalizePost(action.payload);
-          state.post.likes = normalized.likes;
-          state.post.isLiked = normalized.isLiked;
-          state.post.likedBy = normalized.likedBy;
+          state.post.likes = action.payload.likes;
+          state.post.isLiked = action.payload.isLiked;
+          state.post.likedBy = action.payload.likedBy;
         }
       })
 

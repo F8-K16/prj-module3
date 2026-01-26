@@ -112,6 +112,20 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
   };
 
   if (!open) return null;
+  if (!postDetailLoading && (!post || !post.userId)) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
+        <div className="bg-[#212328] p-6 rounded-lg text-white text-center">
+          <p className="mb-4 text-sm text-gray-300">
+            Bài viết này không còn tồn tại hoặc người dùng đã bị xoá.
+          </p>
+          <button onClick={onClose} className="text-blue-500 font-medium">
+            Đóng
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
