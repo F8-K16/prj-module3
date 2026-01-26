@@ -213,175 +213,183 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
 
             {listLoading && comment.length === 0 && <Spinner />}
 
-            {comments.map((comment) => (
-              <div key={comment._id} className="flex gap-3">
-                <Link
-                  to={`/user/${comment.userId._id}`}
-                  className="cursor-pointer"
-                  onClick={onClose}
-                >
-                  <Avatar
-                    src={comment.userId.profilePicture}
-                    name={comment.userId.username}
-                    size={32}
-                  />
-                </Link>
-                <div className="flex-1">
-                  <div className=" group">
-                    <div className="flex items-center justify-between">
-                      <p className="text-[#f8f9f9]">
-                        <Link
-                          to={`/user/${comment.userId._id}`}
-                          onClick={onClose}
+            {comments
+              .filter((comment) => comment.userId)
+              .map((comment) => (
+                <div key={comment._id} className="flex gap-3">
+                  <Link
+                    to={`/user/${comment.userId._id}`}
+                    className="cursor-pointer"
+                    onClick={onClose}
+                  >
+                    <Avatar
+                      src={comment.userId.profilePicture}
+                      name={comment.userId.username}
+                      size={32}
+                    />
+                  </Link>
+                  <div className="flex-1">
+                    <div className=" group">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[#f8f9f9]">
+                          <Link
+                            to={`/user/${comment.userId._id}`}
+                            onClick={onClose}
+                          >
+                            <span className="font-medium mr-1 text-white">
+                              {comment.userId.username}
+                            </span>
+                          </Link>
+                          {comment.content}
+                        </p>
+                        <button
+                          disabled={comment.likeLoading}
+                          onClick={() =>
+                            dispatch(
+                              toggleLikeComment({
+                                postId: post!._id,
+                                commentId: comment!._id,
+                              }),
+                            )
+                          }
+                          className="flex items-center gap-1 text-xs cursor-pointer"
                         >
-                          <span className="font-medium mr-1 text-white">
-                            {comment.userId.username}
+                          {comment.likeLoading ? (
+                            <Spinner />
+                          ) : (
+                            <Heart
+                              size={16}
+                              className={`transition ${
+                                comment.isLiked
+                                  ? "fill-red-500 text-red-500"
+                                  : ""
+                              }`}
+                            />
+                          )}
+                        </button>
+                      </div>
+                      <div
+                        className={`flex items-center gap-3 mt-1 text-xs text-[#a2aab4] ${comment.repliesHasMore ? "mb-5" : ""}`}
+                      >
+                        <span>{formatTimeAgo(comment.createdAt)}</span>
+                        {comment.likes !== 0 && (
+                          <span className="font-semibold">
+                            {comment.likes} lượt thích
                           </span>
-                        </Link>
-                        {comment.content}
-                      </p>
-                      <button
-                        disabled={comment.likeLoading}
-                        onClick={() =>
-                          dispatch(
-                            toggleLikeComment({
-                              postId: post!._id,
-                              commentId: comment!._id,
-                            }),
-                          )
-                        }
-                        className="flex items-center gap-1 text-xs cursor-pointer"
-                      >
-                        {comment.likeLoading ? (
-                          <Spinner />
-                        ) : (
-                          <Heart
-                            size={16}
-                            className={`transition ${
-                              comment.isLiked ? "fill-red-500 text-red-500" : ""
-                            }`}
-                          />
                         )}
-                      </button>
-                    </div>
-                    <div
-                      className={`flex items-center gap-3 mt-1 text-xs text-[#a2aab4] ${comment.repliesHasMore ? "mb-5" : ""}`}
-                    >
-                      <span>{formatTimeAgo(comment.createdAt)}</span>
-                      {comment.likes !== 0 && (
-                        <span className="font-semibold">
-                          {comment.likes} lượt thích
-                        </span>
-                      )}
-                      <button
-                        className="cursor-pointer font-semibold"
-                        onClick={() => {
-                          setReplyTo(comment);
-                          commentInputRef.current?.focus();
-                        }}
-                      >
-                        Trả lời
-                      </button>
-
-                      {/* Options */}
-                      <button
-                        onClick={() =>
-                          dispatch(
-                            openCommentOptionsModal({
-                              postId: post!._id,
-                              commentId: comment._id,
-                              ownerId: comment.userId._id,
-                            }),
-                          )
-                        }
-                        className="ml-2 opacity-0 group-hover:opacity-100 transition cursor-pointer"
-                      >
-                        <MoreHorizontal size={20} />
-                      </button>
-                    </div>
-                  </div>
-
-                  {comment.replyCreating && (
-                    <div className="ml-10 mt-2">
-                      <Spinner />
-                    </div>
-                  )}
-
-                  {comment.repliesVisible &&
-                    comment.replies.map((reply) => (
-                      <div key={reply._id} className="flex gap-3 my-5">
-                        <Link
-                          to={`/user/${reply.userId._id}`}
-                          onClick={onClose}
+                        <button
+                          className="cursor-pointer font-semibold"
+                          onClick={() => {
+                            setReplyTo(comment);
+                            commentInputRef.current?.focus();
+                          }}
                         >
-                          <Avatar
-                            src={reply.userId.profilePicture}
-                            name={reply.userId.username}
-                            size={28}
-                          />
-                        </Link>
-                        <div className="flex-1">
-                          <p className="text-[#f8f9f9] text-sm">
+                          Trả lời
+                        </button>
+
+                        {/* Options */}
+                        <button
+                          onClick={() =>
+                            dispatch(
+                              openCommentOptionsModal({
+                                postId: post!._id,
+                                commentId: comment._id,
+                                ownerId: comment.userId._id,
+                              }),
+                            )
+                          }
+                          className="ml-2 opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                        >
+                          <MoreHorizontal size={20} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {comment.replyCreating && (
+                      <div className="ml-10 mt-2">
+                        <Spinner />
+                      </div>
+                    )}
+
+                    {comment.repliesVisible &&
+                      comment.replies
+                        .filter((reply) => reply.userId)
+                        .map((reply) => (
+                          <div key={reply._id} className="flex gap-3 my-5">
                             <Link
                               to={`/user/${reply.userId._id}`}
                               onClick={onClose}
                             >
-                              <span className="font-medium mr-1 text-white">
-                                {reply.userId.username}
-                              </span>
+                              <Avatar
+                                src={reply.userId.profilePicture}
+                                name={reply.userId.username}
+                                size={28}
+                              />
                             </Link>
-                            {reply.content}
-                          </p>
-                          <div className="flex items-center">
-                            <span className="text-xs text-[#a2aab4]">
-                              {formatTimeAgo(reply.createdAt)}
-                            </span>
+                            <div className="flex-1">
+                              <p className="text-[#f8f9f9] text-sm">
+                                <Link
+                                  to={`/user/${reply.userId._id}`}
+                                  onClick={onClose}
+                                >
+                                  <span className="font-medium mr-1 text-white">
+                                    {reply.userId.username}
+                                  </span>
+                                </Link>
+                                {reply.content}
+                              </p>
+                              <div className="flex items-center">
+                                <span className="text-xs text-[#a2aab4]">
+                                  {formatTimeAgo(reply.createdAt)}
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    ))}
+                        ))}
 
-                  {comment.repliesHasMore && !comment.repliesLoading && (
-                    <div
-                      onClick={() =>
-                        dispatch(
-                          fetchCommentReplies({
-                            postId: post!._id,
-                            commentId: comment._id,
-                          }),
-                        )
-                      }
-                      className="flex items-center gap-5 cursor-pointer"
-                    >
-                      <div className="w-6 h-px bg-white mt-1"></div>
-                      <button className=" text-xs text-[#a2a3b4] font-semibold cursor-pointer">
-                        Xem câu trả lời
-                      </button>
-                    </div>
-                  )}
-
-                  {!comment.repliesHasMore &&
-                    comment.repliesVisible &&
-                    comment.replies.length > 0 && (
+                    {comment.repliesHasMore && !comment.repliesLoading && (
                       <div
-                        className="mt-5 flex items-center gap-5 cursor-pointer"
-                        onClick={() => dispatch(toggleHideReplies(comment._id))}
+                        onClick={() =>
+                          dispatch(
+                            fetchCommentReplies({
+                              postId: post!._id,
+                              commentId: comment._id,
+                            }),
+                          )
+                        }
+                        className="flex items-center gap-5 cursor-pointer"
                       >
                         <div className="w-6 h-px bg-white mt-1"></div>
-                        <button className="text-xs text-[#a2a3b4] font-semibold cursor-pointer">
-                          Ẩn câu trả lời
+                        <button className=" text-xs text-[#a2a3b4] font-semibold cursor-pointer">
+                          Xem câu trả lời
                         </button>
                       </div>
                     )}
 
-                  {comment.repliesLoading && (
-                    <div className="ml-10 mt-2">
-                      <Spinner />
-                    </div>
-                  )}
+                    {!comment.repliesHasMore &&
+                      comment.repliesVisible &&
+                      comment.replies.length > 0 && (
+                        <div
+                          className="mt-5 flex items-center gap-5 cursor-pointer"
+                          onClick={() =>
+                            dispatch(toggleHideReplies(comment._id))
+                          }
+                        >
+                          <div className="w-6 h-px bg-white mt-1"></div>
+                          <button className="text-xs text-[#a2a3b4] font-semibold cursor-pointer">
+                            Ẩn câu trả lời
+                          </button>
+                        </div>
+                      )}
+
+                    {comment.repliesLoading && (
+                      <div className="ml-10 mt-2">
+                        <Spinner />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
             {hasMore && !listLoading && (
               <button
                 onClick={() => {
