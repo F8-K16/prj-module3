@@ -1,13 +1,11 @@
 import {
   clearUnreadForConversation,
-  fetchConversations,
   setCurrentConversation,
 } from "@/features/messageSlice";
 import { openNewMessageModal } from "@/features/modalSlice";
 import type { AppDispatch, RootState } from "@/store/store";
 import type { ModalProps } from "@/types/modal";
 import { ImageIcon, SquarePen } from "lucide-react";
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Avatar from "../Avatar";
@@ -22,12 +20,6 @@ export default function ChatModal({ open }: ModalProps) {
   const { conversations, conversationsLoading, currentConversation } =
     useSelector((state: RootState) => state.messages);
   const authUser = useSelector((state: RootState) => state.auth.user);
-
-  useEffect(() => {
-    if (open) {
-      dispatch(fetchConversations());
-    }
-  }, [open, dispatch]);
 
   const handleOpenConversation = (conversation: Conversation) => {
     dispatch(setCurrentConversation(conversation));

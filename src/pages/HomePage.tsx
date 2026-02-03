@@ -17,6 +17,7 @@ import { openPostModal, openPostOptionsModal } from "@/features/modalSlice";
 import type { AppDispatch, RootState } from "@/store/store";
 import {
   fetchNewsfeed,
+  resetNewsFeed,
   toggleLikePost,
   toggleSavePost,
 } from "@/features/postSlice";
@@ -56,8 +57,11 @@ export default function HomePage() {
   }, [dispatch, postLoading, hasMore]);
 
   useEffect(() => {
-    dispatch(fetchNewsfeed());
     dispatch(fetchSuggestedUsers());
+
+    return () => {
+      dispatch(resetNewsFeed());
+    };
   }, [dispatch]);
 
   if (isFirstLoad && postLoading) return <Loading />;

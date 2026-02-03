@@ -209,7 +209,6 @@ export default function ChatWindow({ variant = "page" }: ChatWindowProps) {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // ================= GUARD =================
   if (!currentConversation || !otherUser) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -222,7 +221,6 @@ export default function ChatWindow({ variant = "page" }: ChatWindowProps) {
     <div
       className={`flex flex-col h-full text-white ${variant === "page" ? "ml-36" : ""}`}
     >
-      {/* Header */}
       <div
         className={`flex items-center px-4  border-b border-[#363636] ${variant === "page" ? "-mt-7 pb-3" : "pb-3 pt-7 shrink-0"} `}
       >

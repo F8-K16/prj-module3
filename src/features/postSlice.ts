@@ -175,6 +175,13 @@ const postSlice = createSlice({
     resetDeletedPostId: (state) => {
       state.deletedPostId = null;
     },
+    resetNewsFeed: (state) => {
+      state.posts = [];
+      state.offset = 0;
+      state.hasMore = true;
+      state.isFirstLoad = true;
+      state.postLoading = false;
+    },
   },
   extraReducers(builder) {
     builder
@@ -190,6 +197,7 @@ const postSlice = createSlice({
         const newPosts = action.payload.posts.filter(
           (p) => !existingIds.has(p._id),
         );
+        console.log(action.payload);
 
         state.posts.push(...newPosts);
         state.hasMore = action.payload.hasMore;
@@ -290,4 +298,4 @@ const postSlice = createSlice({
 });
 
 export default postSlice.reducer;
-export const { resetDeletedPostId } = postSlice.actions;
+export const { resetDeletedPostId, resetNewsFeed } = postSlice.actions;
