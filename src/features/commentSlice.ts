@@ -16,7 +16,7 @@ const initialState: CommentState = {
   comments: [],
   listLoading: false,
   hasMore: true,
-  limit: 20,
+  limit: 10,
   createLoading: false,
   deleteLoading: false,
 };

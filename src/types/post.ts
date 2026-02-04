@@ -28,10 +28,17 @@ export type PostState = {
   deleteLoading: boolean;
   updateLoading: boolean;
   deletedPostId: string | null;
+
   hasMore: boolean;
   offset: number;
   limit: number;
   isFirstLoad: boolean;
+
+  explorePosts: Post[];
+  exploreOffset: number;
+  exploreHasMore: boolean;
+  exploreLoading: boolean;
+  exploreFirstLoad: boolean;
 };
 
 export type PostDetailState = {

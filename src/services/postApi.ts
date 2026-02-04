@@ -5,22 +5,31 @@ import { parseApiError } from "@/utils/helper";
 /* ================= FEED ================= */
 export const getNewsfeed = async (
   offset = 0,
-  limit = 20,
+  limit = 10,
 ): Promise<{
   posts: Post[];
   hasMore: boolean;
 }> => {
-  const res = await instance.get("/api/posts/feed", {
-    params: { offset, limit },
-  });
+  try {
+    const res = await instance.get("/api/posts/feed", {
+      params: { offset, limit },
+    });
 
-  return res.data.data;
+    return res.data.data;
+  } catch (err) {
+    throw parseApiError(err);
+  }
 };
 
-export const getPostsTrending = async (): Promise<Post[]> => {
+export const getPostsTrending = async (
+  offset = 0,
+  limit = 10,
+): Promise<{ posts: Post[]; hasMore: boolean }> => {
   try {
-    const res = await instance.get(`/api/posts/explore`);
-    return res.data.data.posts;
+    const res = await instance.get(`/api/posts/explore`, {
+      params: { offset, limit },
+    });
+    return res.data.data;
   } catch (err) {
     throw parseApiError(err);
   }

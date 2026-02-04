@@ -57,11 +57,8 @@ export default function HomePage() {
   }, [dispatch, postLoading, hasMore]);
 
   useEffect(() => {
+    dispatch(resetNewsFeed());
     dispatch(fetchSuggestedUsers());
-
-    return () => {
-      dispatch(resetNewsFeed());
-    };
   }, [dispatch]);
 
   if (isFirstLoad && postLoading) return <Loading />;

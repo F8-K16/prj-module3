@@ -20,10 +20,17 @@ const initialState: PostState = {
   updateLoading: false,
   deleteLoading: false,
   deletedPostId: null,
+
   hasMore: true,
   offset: 0,
-  limit: 20,
+  limit: 10,
   isFirstLoad: true,
+
+  explorePosts: [],
+  exploreOffset: 0,
+  exploreHasMore: true,
+  exploreLoading: false,
+  exploreFirstLoad: true,
 };
 
 export const fetchNewsfeed = createAsyncThunk<
@@ -51,12 +58,23 @@ export const fetchNewsfeed = createAsyncThunk<
 });
 
 export const fetchPostsTrending = createAsyncThunk<
-  Post[],
+  {
+    posts: Post[];
+    hasMore: boolean;
+    offset: number;
+  },
   void,
-  { rejectValue: ApiError }
->("posts/fetchPostsTrending", async (_, { rejectWithValue }) => {
+  { state: RootState; rejectValue: ApiError }
+>("posts/fetchExplorePosts", async (_, { getState, rejectWithValue }) => {
   try {
-    return await getPostsTrending();
+    const { exploreOffset, limit } = getState().posts;
+    const res = await getPostsTrending(exploreOffset, limit);
+
+    return {
+      posts: res.posts,
+      hasMore: res.hasMore,
+      offset: exploreOffset + res.posts.length,
+    };
   } catch (err) {
     return rejectWithValue(err as ApiError);
   }
@@ -182,6 +200,11 @@ const postSlice = createSlice({
       state.isFirstLoad = true;
       state.postLoading = false;
     },
+    resetExplore: (state) => {
+      state.explorePosts = [];
+      state.exploreOffset = 0;
+      state.exploreHasMore = true;
+    },
   },
   extraReducers(builder) {
     builder
@@ -197,7 +220,6 @@ const postSlice = createSlice({
         const newPosts = action.payload.posts.filter(
           (p) => !existingIds.has(p._id),
         );
-        console.log(action.payload);
 
         state.posts.push(...newPosts);
         state.hasMore = action.payload.hasMore;
@@ -212,14 +234,25 @@ const postSlice = createSlice({
 
       /* ===== FETCH EXPLORE POSTS ===== */
       .addCase(fetchPostsTrending.pending, (state) => {
-        state.postLoading = true;
+        if (state.exploreFirstLoad) {
+          state.exploreLoading = true;
+        }
       })
       .addCase(fetchPostsTrending.fulfilled, (state, action) => {
-        state.posts = action.payload;
-        state.postLoading = false;
+        const existingIds = new Set(state.explorePosts.map((p) => p._id));
+
+        const newPosts = action.payload.posts.filter(
+          (p) => !existingIds.has(p._id),
+        );
+        state.explorePosts.push(...newPosts);
+        state.exploreHasMore = action.payload.hasMore;
+        state.exploreOffset = action.payload.offset;
+        state.exploreLoading = false;
+        state.exploreFirstLoad = false;
       })
       .addCase(fetchPostsTrending.rejected, (state) => {
-        state.postLoading = false;
+        state.exploreLoading = false;
+        state.exploreFirstLoad = false;
       })
 
       /* ===== LIKE POST ===== */
@@ -298,4 +331,5 @@ const postSlice = createSlice({
 });
 
 export default postSlice.reducer;
-export const { resetDeletedPostId, resetNewsFeed } = postSlice.actions;
+export const { resetDeletedPostId, resetNewsFeed, resetExplore } =
+  postSlice.actions;
