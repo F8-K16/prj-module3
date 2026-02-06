@@ -16,6 +16,10 @@ const modalSlice = createSlice({
       state.postId = action.payload;
     },
 
+    openSearch(state) {
+      state.activeModal = "search";
+    },
+
     openNewMessageModal(state) {
       state.activeModal = "new-message";
     },
@@ -121,6 +125,7 @@ const modalSlice = createSlice({
 
 export const {
   openPostModal,
+  openSearch,
   openNewMessageModal,
   openCreateModal,
   openFollowersModal,

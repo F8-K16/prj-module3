@@ -84,16 +84,16 @@ export default function InfoPage() {
   }, [avatarPreview, user]);
 
   return (
-    <div className="max-w-175 space-y-10 mx-auto">
+    <div className="w-[70%] space-y-10 mx-auto">
       <h1 className="text-xl font-bold">Chỉnh sửa trang cá nhân</h1>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="space-y-6 bg-zinc-900 px-5 py-6 rounded-2xl"
+        className="w-full space-y-6 bg-zinc-900 px-5 py-6 rounded-2xl"
       >
         {/* Avatar */}
         <div className="flex items-center gap-4 dark:bg-[#262626] p-4 rounded-3xl">
-          <Avatar src={avatarUrl} name={user?.username || "U"} size={56} />
+          <Avatar src={avatarUrl} name={user?.username} size={56} />
           <div className="flex flex-col">
             <span className="font-semibold">{user?.username}</span>
             <span className="text-sm text-[#a8a8a8]">{user?.fullName}</span>

@@ -17,13 +17,13 @@ export default function SidebarActionButton({
     <button
       onClick={onClick}
       className={`
-        flex items-center rounded-lg p-3 transition hover:bg-[#f3f3f3] dark:hover:bg-[#25282c] cursor-pointer
-        ${isCollapsed ? "w-15 justify-center p-2" : "gap-4"}
+        flex items-center justify-center lg:justify-start rounded-lg p-3 transition hover:bg-[#f3f3f3] dark:hover:bg-[#25282c] cursor-pointer
+        ${isCollapsed ? "w-15 justify-center! p-2" : "gap-4"}
         ${isActive ? "font-bold  bg-[#cbcbcb] dark:bg-[#25292e]" : ""}
       `}
     >
       {icon}
-      {!isCollapsed && <span>{label}</span>}
+      {!isCollapsed && <span className="hidden lg:inline">{label}</span>}
     </button>
   );
 }

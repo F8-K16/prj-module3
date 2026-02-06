@@ -130,10 +130,10 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center"
+      className="fixed inset-0 z-50 bg-black/80 flex md:items-center md:justify-center"
     >
       <button
-        className="absolute top-4 right-5 text-white text-xl font-semibold"
+        className="absolute top-4 right-4 z-50 text-white text-xl md:top-4 md:right-5"
         onClick={onClose}
       >
         ✕
@@ -141,9 +141,9 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
 
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-black rounded-lg overflow-hidden flex w-[60%] h-[90%]"
+        className="bg-black overflow-hidden flex flex-col md:flex-row w-full h-full lg:w-[90%] xl:w-[70%] md:h-[90%] md:rounded-lg"
       >
-        <div className="flex-1 bg-black flex items-center justify-center">
+        <div className="bg-black flex items-center justify-center md:flex-1 max-h-[60vh] md:max-h-full">
           {postDetailLoading && (
             <p className="text-white text-sm">Đang tải...</p>
           )}
@@ -152,7 +152,7 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
             <img
               src={getMediaUrl(post.image)}
               alt="post"
-              className="w-full h-full object-fit"
+              className="w-full max-h-[60vh] md:max-h-full object-contain"
             />
           )}
 
@@ -168,7 +168,7 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
         </div>
 
         {/* ================= RIGHT PANEL ================= */}
-        <div className="w-120 bg-[#212328] text-white flex flex-col border-l border-[#262626]">
+        <div className="w-full md:w-80 xl:w-120 bg-[#212328] text-white flex flex-col border-t md:border-t-0 md:border-l border-[#262626]">
           <div className="flex items-center gap-3 p-4 border-b border-[#262626]">
             <Link
               to={`/user/${post?.userId._id}`}

@@ -20,7 +20,7 @@ import SidebarHybridButton from "@/components/buttons/SidebarHybridButton";
 import ChatModal from "@/components/modals/ChatModal";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@/store/store";
-import { openCreateModal } from "@/features/modalSlice";
+import { closeModal, openCreateModal } from "@/features/modalSlice";
 import Avatar from "@/components/Avatar";
 
 type ActivePanel = "search" | "notification" | "option" | "chat" | null;
@@ -28,6 +28,9 @@ type ActivePanel = "search" | "notification" | "option" | "chat" | null;
 export default function Sidebar() {
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const dispatch = useDispatch<AppDispatch>();
+  const activeModal = useSelector(
+    (state: RootState) => state.modals.activeModal,
+  );
   const user = useSelector((state: RootState) => state.auth.user);
   const location = useLocation();
 
@@ -45,6 +48,11 @@ export default function Sidebar() {
     setActivePanel(null);
   };
 
+  const handleCloseSearch = () => {
+    setActivePanel(null);
+    dispatch(closeModal());
+  };
+
   const isSidebarCollapsed =
     resolvedActivePanel === "search" ||
     resolvedActivePanel === "notification" ||
@@ -56,10 +64,20 @@ export default function Sidebar() {
     }
   }, [isChatRoute]);
 
+  useEffect(() => {
+    if (activeModal === "search") {
+      setActivePanel("search");
+    }
+
+    if (activeModal === null) {
+      setActivePanel(null);
+    }
+  }, [activeModal]);
+
   return (
     <>
       <aside
-        className={`hidden md:flex fixed top-0 left-0 h-screen w-84 pt-4 pb-6 px-3 z-40 flex-col ${
+        className={`hidden sm:flex sm:fixed top-0 left-0 h-screen sm:w-20 lg:w-60 xl:w-72 pt-4 pb-6 px-3 z-40 flex-col ${
           isSidebarCollapsed
             ? ""
             : "border-r border-[#dbdfe4] dark:border-[#262626] shadow-2xl"
@@ -70,16 +88,18 @@ export default function Sidebar() {
             <Instagram />
           </NavLink>
         ) : (
-          <Link to="/">
+          <Link to="/" onClick={() => setActivePanel(null)} className="m-4">
+            <Instagram className="lg:hidden" />
+
             <img
               src="/icons/logo.svg"
               alt="Instagram"
-              className="w-30 m-4 hidden dark:block"
+              className="hidden dark:lg:block w-30"
             />
             <img
               src="/icons/logo-light.svg"
               alt="Instagram"
-              className="w-30 m-4 dark:hidden"
+              className="hidden lg:block dark:hidden w-30"
             />
           </Link>
         )}
@@ -139,7 +159,7 @@ export default function Sidebar() {
             icon={
               <Avatar
                 src={user?.profilePicture}
-                name={user?.username || "U"}
+                name={user?.username}
                 size={24}
               />
             }
@@ -149,7 +169,7 @@ export default function Sidebar() {
           />
         </nav>
 
-        <div className="mt-auto pt-4 w-full">
+        <div className="mt-auto pt-4 w-full justify-center lg:justify-start">
           <SidebarActionButton
             icon={<Menu />}
             label="Xem thêm"
@@ -162,8 +182,8 @@ export default function Sidebar() {
 
       {/* Modals */}
       <SearchModal
-        open={resolvedActivePanel === "search"}
-        onClose={closePanel}
+        open={activeModal === "search" || resolvedActivePanel === "search"}
+        onClose={handleCloseSearch}
       />
       <NotificationModal
         open={resolvedActivePanel === "notification"}

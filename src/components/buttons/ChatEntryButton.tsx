@@ -23,14 +23,15 @@ export default function ChatEntryButton() {
   return (
     <button
       onClick={() => dispatch(openChatListModal())}
-      className="fixed right-10 bottom-10 flex items-center gap-3 px-5 h-14 rounded-full dark:bg-[#212328] dark:hover:bg-[#212328]/50 cursor-pointer shadow-2xl"
+      className="hidden fixed right-4 bottom-4 sm:right-6 sm:bottom-6 lg:right-10 lg:bottom-10 sm:flex items-center gap-3 w-14 lg:w-auto h-14 px-0 lg:px-5 rounded-full dark:bg-[#212328] dark:hover:bg-[#212328]/50 shadow-2xl cursor-pointer"
     >
-      <Send size={24} />
+      <Send size={24} className="mx-4 lg:mx-0" />
 
-      <span className="font-semibold whitespace-nowrap">Tin nhắn</span>
+      <span className="hidden lg:inline font-semibold whitespace-nowrap">
+        Tin nhắn
+      </span>
 
-      {/* Avatar preview */}
-      <div className="flex -space-x-1 ml-6">
+      <div className="hidden lg:flex -space-x-1 ml-4">
         {previewUsers.map((user, i) => (
           <Avatar
             key={i}

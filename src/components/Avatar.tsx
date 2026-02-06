@@ -4,9 +4,10 @@ type AvatarProps = {
   src?: string | null;
   name?: string;
   size?: number;
+  classes?: string;
 };
 
-export default function Avatar({ src, name, size = 24 }: AvatarProps) {
+export default function Avatar({ src, name, size = 24, classes }: AvatarProps) {
   let avatarSrc: string | undefined;
 
   if (src) {
@@ -24,7 +25,7 @@ export default function Avatar({ src, name, size = 24 }: AvatarProps) {
       <img
         src={avatarSrc}
         alt={name}
-        className="rounded-full object-cover"
+        className={`rounded-full object-cover ${classes}`}
         style={{ width: size, height: size }}
       />
     );

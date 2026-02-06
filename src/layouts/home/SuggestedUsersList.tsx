@@ -46,7 +46,7 @@ export default function SuggestedUsersList() {
               <div>
                 <Link
                   to={`/user/${user._id}`}
-                  className="text-sm font-semibold"
+                  className="text-xs xl:text-sm font-semibold"
                 >
                   {user.username}
                 </Link>

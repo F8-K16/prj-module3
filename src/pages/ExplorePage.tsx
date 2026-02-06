@@ -37,7 +37,7 @@ export default function ExplorePage() {
   if (exploreLoading && exploreFirstLoad) return <Loading />;
 
   return (
-    <div className="w-290.5 mx-auto grid grid-cols-5 gap-px">
+    <div className="w-full mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-px">
       {explorePosts.map((post) => (
         <div
           onClick={() => dispatch(openPostModal(post._id))}
@@ -48,7 +48,7 @@ export default function ExplorePage() {
             <div className="relative h-full">
               <img
                 src={getMediaUrl(post.image)}
-                className="w-full h-full object-fit"
+                className="w-full h-full aspect-square object-cover hover:opacity-80"
               />
               <Images className="absolute top-3 right-3" />
             </div>
@@ -58,7 +58,7 @@ export default function ExplorePage() {
             <div className="relative h-full">
               <video
                 src={getMediaUrl(post.video)}
-                className="w-full h-full object-cover"
+                className="w-full h-full aspect-square object-contain"
                 muted
                 autoPlay
               />

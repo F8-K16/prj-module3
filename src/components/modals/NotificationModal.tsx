@@ -9,11 +9,11 @@ export default function NotificationModal({ open, onClose }: ModalProps) {
     <>
       <div
         onClick={onClose}
-        className="fixed top-0 left-20 right-0 bottom-0 z-40"
+        className="fixed top-0 left-20 right-0 bottom-0 z-40 "
       />
 
       <div
-        className="fixed top-0 left-20 h-full w-100 z-50
+        className="fixed top-0 left-20 h-full w-100 z-50 bg-white dark:bg-[#0c1013]
          border-r border-[#dbdfe4] shadow-2xl dark:border-l dark:border-[#262626] animate-in fade-in"
       >
         <div className="p-6 space-y-6">

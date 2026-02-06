@@ -18,13 +18,13 @@ export default function SidebarButton({
       to={to}
       onClick={onNavigate}
       className={({ isActive }) =>
-        `flex items-center rounded-lg p-3 transition hover:bg-[#f3f3f3] dark:hover:bg-[#25282c]
-         ${disableActive ? "w-15 justify-center" : "gap-4"}
+        `flex items-center justify-center lg:justify-start rounded-lg p-3 transition hover:bg-[#f3f3f3] dark:hover:bg-[#25282c]
+         ${disableActive ? "w-15 justify-center!" : "gap-4"}
          ${isActive && !disableActive ? "font-bold" : ""}`
       }
     >
       {icon}
-      {!disableActive && <span>{label}</span>}
+      {!disableActive && <span className="hidden lg:inline">{label}</span>}
     </NavLink>
   );
 }

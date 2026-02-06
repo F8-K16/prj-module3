@@ -1,5 +1,6 @@
 type ModalType =
   | "post"
+  | "search"
   | "new-message"
   | "create"
   | "followers"

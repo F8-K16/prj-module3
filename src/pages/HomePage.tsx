@@ -64,8 +64,8 @@ export default function HomePage() {
   if (isFirstLoad && postLoading) return <Loading />;
 
   return (
-    <div className="flex ml-80">
-      <div className="flex flex-col gap-14">
+    <div className="flex">
+      <div className="w-full max-w-117.5 flex flex-col gap-10">
         {posts
           .filter((post) => post.userId)
           .map((post) => {
@@ -74,9 +74,9 @@ export default function HomePage() {
             return (
               <Card
                 key={post._id}
-                className="border-0 bg-transparent p-0 m-0 w-125 gap-0"
+                className="border-0 bg-transparent p-0 m-0 full gap-0"
               >
-                <CardHeader className="gap-0 px-5">
+                <CardHeader className="gap-0 px-3 sm:px-5">
                   <div className="flex items-center gap-3 mb-3">
                     <Link to={`/user/${user._id}`}>
                       <Avatar
@@ -116,7 +116,7 @@ export default function HomePage() {
                     <img
                       src={getMediaUrl(post.image)}
                       alt="post"
-                      className="w-full h-full object-fit rounded-md"
+                      className="w-full aspect-square object-cover rounded-md"
                     />
                   )}
 
@@ -194,7 +194,7 @@ export default function HomePage() {
           })}
         <div ref={loadMoreRef} className="h-10" />
       </div>
-      <div className="ml-36 w-78.75">
+      <div className="ml-10 xl:ml-30 w-78.75 hidden lg:block">
         <div className="flex items-center gap-3">
           <Link to={user ? `/user/${user._id}` : "/"}>
             <Avatar
