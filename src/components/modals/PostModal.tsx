@@ -63,6 +63,17 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
   useEscapeKey(open, onClose);
 
   useEffect(() => {
+    if (open) {
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      document.body.style.overflow = "hidden";
+
+      return () => {
+        document.body.style.overflow = originalStyle;
+      };
+    }
+  }, [open]);
+
+  useEffect(() => {
     if (open && postId) {
       dispatch(fetchPostDetail(postId));
       dispatch(fetchPostComments({ postId }));
@@ -114,7 +125,7 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
   if (!open) return null;
   if (!postDetailLoading && (!post || !post.userId)) {
     return (
-      <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
+      <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center overflow-hidden">
         <div className="bg-[#212328] p-6 rounded-lg text-white text-center">
           <p className="mb-4 text-sm text-gray-300">
             Bài viết này không còn tồn tại hoặc người dùng đã bị xoá.
@@ -141,9 +152,9 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
 
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-black overflow-hidden flex flex-col md:flex-row w-full h-full lg:w-[90%] xl:w-[70%] md:h-[90%] md:rounded-lg"
+        className="bg-black overflow-hidden flex flex-col md:flex-row w-full lg:w-[90%] xl:w-[70%] md:rounded-lg h-dvh md:h-[90%]"
       >
-        <div className="bg-black flex items-center justify-center md:flex-1 max-h-[60vh] md:max-h-full">
+        <div className="bg-black flex items-center justify-center h-[60vh] md:flex-1 max-h-[60vh] md:h-auto">
           {postDetailLoading && (
             <p className="text-white text-sm">Đang tải...</p>
           )}
@@ -168,8 +179,8 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
         </div>
 
         {/* ================= RIGHT PANEL ================= */}
-        <div className="w-full md:w-80 xl:w-120 bg-[#212328] text-white flex flex-col border-t md:border-t-0 md:border-l border-[#262626]">
-          <div className="flex items-center gap-3 p-4 border-b border-[#262626]">
+        <div className="w-full md:w-80 xl:w-120 bg-[#212328] text-white flex flex-col h-[40vh] md:h-full border-t md:border-t-0 md:border-l border-[#262626]">
+          <div className="flex items-center gap-3 px-4 py-2 md:p-4 border-b border-[#262626]">
             <Link
               to={`/user/${post?.userId._id}`}
               onClick={onClose}
@@ -182,6 +193,16 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
               />
               <span className="font-medium">{post?.userId.username}</span>
             </Link>
+
+            <p className="md:hidden text-gray-400 text-xs">
+              {" "}
+              •{" "}
+              {post &&
+                (() => {
+                  const timeAgo = formatTimeAgo(post.createdAt);
+                  return timeAgo === "vừa xong" ? timeAgo : `${timeAgo} trước`;
+                })()}
+            </p>
 
             <button
               onClick={() =>
@@ -199,7 +220,7 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
             </button>
           </div>
 
-          <div className="flex-1 py-4 px-4 text-sm overflow-y-auto space-y-7">
+          <div className="flex-1 py-4 px-4 text-sm overflow-y-auto space-y-7 min-h-0">
             {post?.caption && (
               <div className="flex gap-3">
                 <Link to={`/user/${post.userId._id}`} onClick={onClose}>
@@ -242,20 +263,22 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
                       size={32}
                     />
                   </Link>
-                  <div className="flex-1">
-                    <div className=" group">
-                      <div className="flex items-center justify-between">
-                        <p className="text-[#f8f9f9]">
-                          <Link
-                            to={`/user/${comment.userId._id}`}
-                            onClick={onClose}
-                          >
-                            <span className="font-medium mr-1 text-white">
-                              {comment.userId.username}
-                            </span>
-                          </Link>
-                          {comment.content}
-                        </p>
+                  <div className="flex-1 min-w-0 overflow-y-auto overscroll-contain">
+                    <div className="group">
+                      <div className="flex items-start gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[#f8f9f9] wrap-break-word whitespace-pre-wrap">
+                            <Link
+                              to={`/user/${comment.userId._id}`}
+                              onClick={onClose}
+                            >
+                              <span className="font-medium mr-1 text-white">
+                                {comment.userId.username}
+                              </span>
+                            </Link>
+                            {comment.content}
+                          </p>
+                        </div>
                         <button
                           disabled={comment.likeLoading}
                           onClick={() =>
@@ -266,7 +289,7 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
                               }),
                             )
                           }
-                          className="flex items-center gap-1 text-xs cursor-pointer"
+                          className="shrink-0 mt-1 text-xs cursor-pointer"
                         >
                           {comment.likeLoading ? (
                             <Spinner />
@@ -340,8 +363,8 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
                                 size={28}
                               />
                             </Link>
-                            <div className="flex-1">
-                              <p className="text-[#f8f9f9] text-sm">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[#f8f9f9] text-sm wrap-break-word whitespace-pre-wrap">
                                 <Link
                                   to={`/user/${reply.userId._id}`}
                                   onClick={onClose}
@@ -417,81 +440,88 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
             )}
           </div>
 
-          <div className="px-4 pt-2 pb-3 border-t border-[#262626] text-sm">
-            <div className="flex items-center gap-1 -ml-2 mb-2">
-              <button
-                className="p-2 cursor-pointer"
-                onClick={() => dispatch(toggleLikePost(post!._id))}
-              >
-                <Heart
-                  className={`h-6 w-6 hover:scale-105 transition ${
-                    post?.isLiked ? "fill-red-500 text-red-500" : "text-white"
-                  }`}
-                />
-              </button>
+          <div className="flex flex-col border-t border-[#262626]">
+            <div className="px-3 py-2 border-b border-[#262626] md:border-none text-sm shrink-0">
+              <div className="flex items-center md:gap-1 md:-ml-2 mb-2">
+                <button
+                  className="p-2 cursor-pointer"
+                  onClick={() => dispatch(toggleLikePost(post!._id))}
+                >
+                  <Heart
+                    className={`h-6 w-6 hover:scale-105 transition ${
+                      post?.isLiked ? "fill-red-500 text-red-500" : "text-white"
+                    }`}
+                  />
+                </button>
 
-              <button
-                onClick={() => commentInputRef.current?.focus()}
-                className="p-2 cursor-pointer"
-              >
-                <MessageCircle className="h-6 w-6 hover:scale-105" />
-              </button>
+                <button
+                  onClick={() => commentInputRef.current?.focus()}
+                  className="p-2 cursor-pointer"
+                >
+                  <MessageCircle className="h-6 w-6 hover:scale-105" />
+                </button>
 
-              <button className="p-2 cursor-pointer">
-                <Send className="h-6 w-6 hover:scale-105" />
-              </button>
+                <button className="p-2 cursor-pointer">
+                  <Send className="h-6 w-6 hover:scale-105" />
+                </button>
 
-              <button
-                className="ml-auto cursor-pointer"
-                onClick={() => dispatch(toggleSavePost(post!._id))}
-              >
-                <Bookmark
-                  className={`h-6 w-6 hover:scale-105 transition ${
-                    post?.isSaved ? "fill-white text-white" : "text-white"
-                  }`}
-                />
-              </button>
+                <button
+                  className="p-2 ml-auto cursor-pointer"
+                  onClick={() => dispatch(toggleSavePost(post!._id))}
+                >
+                  <Bookmark
+                    className={`h-6 w-6 hover:scale-105 transition ${
+                      post?.isSaved ? "fill-white text-white" : "text-white"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <p className="font-medium">{post?.likes} lượt thích</p>
+              <p className="hidden md:block text-gray-400 text-xs mt-1">
+                {post &&
+                  (() => {
+                    const timeAgo = formatTimeAgo(post.createdAt);
+                    return timeAgo === "vừa xong"
+                      ? timeAgo
+                      : `${timeAgo} trước`;
+                  })()}
+              </p>
             </div>
 
-            <p className="font-medium">{post?.likes} lượt thích</p>
-            <p className="text-gray-400 text-xs mt-1">
-              {post &&
-                (() => {
-                  const timeAgo = formatTimeAgo(post.createdAt);
-                  return timeAgo === "vừa xong" ? timeAgo : `${timeAgo} trước`;
-                })()}
-            </p>
-          </div>
-
-          <div className="border-t border-[#262626] p-4">
-            <form onSubmit={handleSubmit} className="flex items-center gap-3">
-              {replyTo && (
-                <div className="text-xs text-blue-400 flex items-center gap-2">
-                  @{replyTo.userId.username}
-                  <button
-                    onClick={() => setReplyTo(null)}
-                    className="text-gray-400"
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
-              <input
-                ref={commentInputRef}
-                value={comment}
-                onChange={handleCommentChange}
-                placeholder="Bình luận..."
-                className="flex-1 bg-transparent outline-none text-sm text-white placeholder-gray-400"
-              />
-
-              <button
-                type="submit"
-                disabled={!comment.trim() || createLoading}
-                className={`text-sm font-medium ${"text-blue-500 hover:text-blue-400 disabled:text-blue-500/40 cursor-default"}`}
+            <div className="w-full p-3 border-t border-[#262626]">
+              <form
+                onSubmit={handleSubmit}
+                className="flex items-center gap-3 min-w-0"
               >
-                {createLoading ? <Spinner /> : "Đăng"}
-              </button>
-            </form>
+                {replyTo && (
+                  <div className="text-xs text-blue-400 flex items-center gap-2">
+                    @{replyTo.userId.username}
+                    <button
+                      onClick={() => setReplyTo(null)}
+                      className="text-gray-400"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+                <input
+                  ref={commentInputRef}
+                  value={comment}
+                  onChange={handleCommentChange}
+                  placeholder="Bình luận..."
+                  className="flex-1 min-w-0 bg-transparent outline-none text-sm text-white placeholder-gray-400 text-wrap"
+                />
+
+                <button
+                  type="submit"
+                  disabled={!comment.trim() || createLoading}
+                  className={`text-sm font-medium ${"text-blue-500 hover:text-blue-400 disabled:text-blue-500/40 cursor-default"}`}
+                >
+                  {createLoading ? <Spinner /> : "Đăng"}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>

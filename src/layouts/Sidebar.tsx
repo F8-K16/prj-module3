@@ -179,7 +179,6 @@ export default function Sidebar() {
           />
         </div>
       </aside>
-
       {/* Modals */}
       <SearchModal
         open={activeModal === "search" || resolvedActivePanel === "search"}
@@ -194,6 +193,7 @@ export default function Sidebar() {
         onClose={closePanel}
         userId={user?._id}
       />
+
       <ChatModal open={resolvedActivePanel === "chat"} onClose={closePanel} />
     </>
   );

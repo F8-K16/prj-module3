@@ -65,7 +65,7 @@ export default function HomePage() {
 
   return (
     <div className="flex">
-      <div className="w-full max-w-117.5 flex flex-col gap-10">
+      <div className="w-full max-w-117.5 flex flex-col gap-6">
         {posts
           .filter((post) => post.userId)
           .map((post) => {
@@ -74,7 +74,7 @@ export default function HomePage() {
             return (
               <Card
                 key={post._id}
-                className="border-0 bg-transparent p-0 m-0 full gap-0"
+                className="border-0 bg-transparent py-4 m-0 full gap-0"
               >
                 <CardHeader className="gap-0 px-3 sm:px-5">
                   <div className="flex items-center gap-3 mb-3">

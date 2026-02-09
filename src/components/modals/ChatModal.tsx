@@ -35,8 +35,8 @@ export default function ChatModal({ open }: ModalProps) {
   });
 
   return (
-    <div className="fixed top-0 left-20 h-full w-100 z-50 border-r border-[#dbdfe4] shadow-2xl dark:border-[#262626] dark:border-l animate-in fade-in bg-white dark:bg-[#0c1014]">
-      <div className="p-5 space-y-6">
+    <div className="fixed top-20 bottom-14 border-t sm:top-0 sm:left-20 w-full sm:h-full md:w-60 lg:w-80 xl:w-100 z-50 border-r border-[#dbdfe4] shadow-2xl dark:border-[#262626] dark:border-l animate-in fade-in bg-white dark:bg-[#0c1014]">
+      <div className="w-full sm:w-[90%] md:w-full p-5 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <span className="text-xl font-bold">{authUser.username}</span>
@@ -56,7 +56,7 @@ export default function ChatModal({ open }: ModalProps) {
       </div>
       <div className="font-semibold mb-2 px-6">Tin nhắn</div>
 
-      <div className="space-y-2">
+      <div className="space-y-2 w-full">
         {conversationsLoading ? (
           <div className="ml-6 mt-3">
             <SkeletonLoading count={6} />
@@ -81,7 +81,7 @@ export default function ChatModal({ open }: ModalProps) {
               <div
                 key={conversation._id}
                 onClick={() => handleOpenConversation(conversation)}
-                className={`flex items-center gap-3 px-6 py-2.5 cursor-pointer ${
+                className={`flex items-center gap-3 px-3 lg:px-6 py-2.5 cursor-pointer ${
                   isActive
                     ? "bg-gray-200 dark:bg-[#2a2a2a]"
                     : "hover:bg-gray-100 dark:hover:bg-[#333]"

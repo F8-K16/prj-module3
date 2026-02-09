@@ -219,7 +219,7 @@ export default function ChatWindow({ variant = "page" }: ChatWindowProps) {
 
   return (
     <div
-      className={`flex flex-col h-full text-white ${variant === "page" ? "ml-36" : ""}`}
+      className={`flex flex-col w-full h-full text-white ${variant === "page" ? "md:ml-54 lg:ml-36 xl:ml-44" : ""}`}
     >
       <div
         className={`flex items-center px-4  border-b border-[#363636] ${variant === "page" ? "-mt-7 pb-3" : "pb-3 pt-7 shrink-0"} `}

@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import Avatar from "@/components/Avatar";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@/store/store";
-import { openCreateModal } from "@/features/modalSlice";
+import { openChatListModal, openCreateModal } from "@/features/modalSlice";
 
 export default function MobileBottombar() {
   const dispatch = useDispatch<AppDispatch>();
@@ -23,9 +23,9 @@ export default function MobileBottombar() {
         <SquarePlus />
       </button>
 
-      <NavLink to="/chat">
+      <button onClick={() => dispatch(openChatListModal())}>
         <MessageCircleHeart />
-      </NavLink>
+      </button>
 
       <NavLink to={user ? `/user/${user._id}` : "/"}>
         <Avatar src={user?.profilePicture} name={user?.username} size={24} />

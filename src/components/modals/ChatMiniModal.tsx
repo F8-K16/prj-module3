@@ -17,7 +17,7 @@ export default function ChatMiniModal() {
   if (activeModal !== "chat-mini" || !conversationId || hide) return null;
 
   return (
-    <div className="fixed bottom-10 right-10 w-90 h-130 bg-white dark:bg-[#212328] rounded-xl shadow-2xl flex flex-col z-99 overflow-hidden">
+    <div className="fixed bottom-14 right-2 sm:bottom-10 sm:right-10 w-90 h-130 max-h-160 bg-white dark:bg-[#212328] rounded-xl shadow-2xl flex flex-col z-99 overflow-hidden">
       <button
         onClick={() => navigate(`/direct/${conversationId}`)}
         className="absolute top-9 right-13 hover:opacity-70 cursor-pointer"

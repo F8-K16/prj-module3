@@ -89,14 +89,14 @@ export default function InfoPage() {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="w-full space-y-6 bg-zinc-900 px-5 py-6 rounded-2xl"
+        className="w-full space-y-6 dark:bg-zinc-900 px-5 py-6 rounded-2xl shadow-xl"
       >
         {/* Avatar */}
         <div className="flex items-center gap-4 dark:bg-[#262626] p-4 rounded-3xl">
           <Avatar src={avatarUrl} name={user?.username} size={56} />
           <div className="flex flex-col">
             <span className="font-semibold">{user?.username}</span>
-            <span className="text-sm text-[#a8a8a8]">{user?.fullName}</span>
+            <span className="text-sm">{user?.fullName}</span>
           </div>
 
           <label

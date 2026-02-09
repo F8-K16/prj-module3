@@ -85,7 +85,7 @@ const messageSlice = createSlice({
   name: "message",
   initialState,
   reducers: {
-    setCurrentConversation(state, action: PayloadAction<Conversation>) {
+    setCurrentConversation(state, action: PayloadAction<Conversation | null>) {
       state.currentConversation = action.payload;
     },
     clearMessages(state) {

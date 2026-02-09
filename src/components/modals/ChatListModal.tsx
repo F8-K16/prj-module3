@@ -38,7 +38,7 @@ export default function ChatListModal() {
   });
 
   return (
-    <div className="fixed bottom-10 right-10 w-90 max-h-130 bg-white dark:bg-[#212328] rounded-xl shadow-2xl z-50 flex flex-col ">
+    <div className="fixed bottom-14 right-2 sm:bottom-10 sm:right-10 w-90 max-h-130 bg-white dark:bg-[#212328] rounded-xl shadow-2xl z-50 flex flex-col ">
       <div className="flex items-center justify-between p-4 border-b border-[#363636]">
         <span className="font-semibold text-lg">Tin nhắn</span>
         <div className="flex gap-3">

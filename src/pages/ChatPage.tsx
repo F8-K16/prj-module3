@@ -1,10 +1,18 @@
+import { setCurrentConversation } from "@/features/messageSlice";
 import { openNewMessageModal } from "@/features/modalSlice";
 import type { AppDispatch } from "@/store/store";
 import { MessageCircleMore } from "lucide-react";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 export default function ChatPage() {
   const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    return () => {
+      dispatch(setCurrentConversation(null));
+    };
+  }, [dispatch]);
 
   return (
     <div className="pl-36 relative w-full h-full">
