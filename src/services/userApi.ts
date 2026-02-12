@@ -35,7 +35,7 @@ export const updateProfileApi = async (data: FormData): Promise<User> => {
 };
 
 /* ================= SUGGESTED USERS ================= */
-export const getSuggestedUsersApi = async (limit = 5): Promise<User[]> => {
+export const getSuggestedUsersApi = async (limit: number): Promise<User[]> => {
   try {
     const res = await instance.get<{
       success: boolean;

@@ -129,7 +129,7 @@ export default function CreatePostModal({ open, onClose }: ModalProps) {
                     <img
                       src={previewUrl}
                       alt="preview"
-                      className="max-h-full max-w-full object-contain"
+                      className="max-h-[90%] max-w-full object-contain"
                     />
                   ) : (
                     <video

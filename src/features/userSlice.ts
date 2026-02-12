@@ -48,11 +48,11 @@ export const fetchProfileById = createAsyncThunk<
 
 export const fetchSuggestedUsers = createAsyncThunk<
   User[],
-  void,
+  { limit: number },
   { rejectValue: ApiError }
->("users/fetchSuggested", async (_, { rejectWithValue }) => {
+>("users/fetchSuggested", async ({ limit = 6 }, { rejectWithValue }) => {
   try {
-    return await getSuggestedUsersApi();
+    return await getSuggestedUsersApi(limit);
   } catch (err) {
     return rejectWithValue(err as ApiError);
   }

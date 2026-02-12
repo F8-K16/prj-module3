@@ -154,7 +154,7 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
         onClick={(e) => e.stopPropagation()}
         className="bg-black overflow-hidden flex flex-col md:flex-row w-full lg:w-[90%] xl:w-[70%] md:rounded-lg h-dvh md:h-[90%]"
       >
-        <div className="bg-black flex items-center justify-center h-[60vh] md:flex-1 max-h-[60vh] md:h-auto">
+        <div className="bg-black flex items-center justify-center h-[60vh] md:flex-1 max-h-[60vh] md:h-auto md:max-h-full">
           {postDetailLoading && (
             <p className="text-white text-sm">Đang tải...</p>
           )}

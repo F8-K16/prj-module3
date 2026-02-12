@@ -19,6 +19,7 @@ import ChatDetailPage from "./pages/ChatDetailPage";
 import { useChatSocket } from "./hooks/useChatSocket";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import ExplorePeoplePage from "./pages/ExplorePeoplePage";
 
 export default function App() {
   const dispatch = useDispatch<AppDispatch>();
@@ -50,6 +51,7 @@ export default function App() {
             />
             <Route path="/user/:userId/*" element={<ProfilePage />} />
             <Route path="/profile" element={<InfoPage />} />
+            <Route path="/explore/people" element={<ExplorePeoplePage />} />
           </Route>
         </Route>
       </Routes>

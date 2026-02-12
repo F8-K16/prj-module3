@@ -58,7 +58,7 @@ export default function HomePage() {
 
   useEffect(() => {
     dispatch(resetNewsFeed());
-    dispatch(fetchSuggestedUsers());
+    dispatch(fetchSuggestedUsers({ limit: 5 }));
   }, [dispatch]);
 
   if (isFirstLoad && postLoading) return <Loading />;

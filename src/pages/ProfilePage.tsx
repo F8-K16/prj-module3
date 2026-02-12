@@ -122,9 +122,9 @@ export default function ProfilePage() {
 
   return (
     <div className="w-full flex justify-center">
-      <div className="w-full max-w-5xl px-3 sm:px-6">
+      <div className="w-full max-w-5xl md:px-6">
         {/* HEADER */}
-        <div className="flex flex-col sm:flex-row gap-6 sm:gap-10 mb-8 items-center sm:items-start">
+        <div className="flex flex-col sm:flex-row gap-3 md:gap-10 mb-8 items-center sm:items-start">
           <Avatar
             src={user.profilePicture}
             name={user.username}
@@ -132,13 +132,13 @@ export default function ProfilePage() {
             classes="sm:!w-[150px] sm:!h-[150px]"
           />
 
-          <div className="space-y-4 w-100">
+          <div className="space-y-2 md:space-y-3 w-100">
             <h2 className="text-xl sm:text-2xl font-bold text-center sm:text-left">
               {user.username}
             </h2>
             <p>{user.fullName}</p>
 
-            <div className="flex justify-between sm:justify-start text-sm w-full">
+            <div className="flex justify-between sm:justify-start gap-2 md:gap-3 text-sm w-full">
               <span>
                 <strong>{posts.length}</strong> bài viết
               </span>

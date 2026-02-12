@@ -6,7 +6,7 @@ import type { AppDispatch, RootState } from "@/store/store";
 import Avatar from "@/components/Avatar";
 
 import Loading from "@/utils/loading/Loading";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { followUser, unfollowUser } from "@/features/userSlice";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -25,9 +25,11 @@ export default function SuggestedUsersList() {
     <div className="space-y-4">
       <div className="flex items-center justify-between mt-6">
         <span className="text-sm font-semibold">Gợi ý cho bạn</span>
-        <button className="text-sm font-semibold cursor-pointer">
-          Xem tất cả
-        </button>
+        <NavLink to="/explore/people">
+          <button className="text-sm font-semibold cursor-pointer">
+            Xem tất cả
+          </button>
+        </NavLink>
       </div>
 
       {suggestedUsers.map((user) => {
