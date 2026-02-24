@@ -103,7 +103,7 @@ export default function SearchModal({ open, onClose }: ModalProps) {
         </div>
 
         {/* ===== Search Result ===== */}
-        <div>
+        <div className="mt-6">
           {searchResult.map((user) => (
             <Link
               key={user._id}

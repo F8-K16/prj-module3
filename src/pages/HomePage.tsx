@@ -199,7 +199,7 @@ export default function HomePage() {
           <Link to={user ? `/user/${user._id}` : "/"}>
             <Avatar
               src={user?.profilePicture}
-              name={user?.username || "U"}
+              name={user?.username}
               size={44}
             />
           </Link>

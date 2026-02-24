@@ -55,7 +55,7 @@ export function formatTimeAgo(dateInput: string | Date): string {
   }
 
   const diffWeeks = Math.floor(diffDays / 7);
-  if (diffWeeks < 4) {
+  if (diffWeeks <= 4) {
     return `${diffWeeks} tuần`;
   }
 

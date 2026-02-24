@@ -59,7 +59,7 @@ export const sendTextMessageThunk = createAsyncThunk<
 export const sendImageMessageThunk = createAsyncThunk<
   Message,
   {
-    conversationId: string;
+    conversationId: string; 
     recipientId: string;
     image: File;
   }

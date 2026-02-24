@@ -154,7 +154,7 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
         onClick={(e) => e.stopPropagation()}
         className="bg-black overflow-hidden flex flex-col md:flex-row w-full lg:w-[90%] xl:w-[70%] md:rounded-lg h-dvh md:h-[90%]"
       >
-        <div className="bg-black flex items-center justify-center h-[60vh] md:flex-1 max-h-[60vh] md:h-auto md:max-h-full">
+        <div className="bg-black flex items-center justify-center h-[50vh] md:flex-1 md:h-auto md:max-h-full">
           {postDetailLoading && (
             <p className="text-white text-sm">Đang tải...</p>
           )}
@@ -163,7 +163,7 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
             <img
               src={getMediaUrl(post.image)}
               alt="post"
-              className="w-full max-h-[60vh] md:max-h-full object-contain"
+              className="w-full h-full object-contain"
             />
           )}
 
@@ -179,7 +179,7 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
         </div>
 
         {/* ================= RIGHT PANEL ================= */}
-        <div className="w-full md:w-80 xl:w-120 bg-[#212328] text-white flex flex-col h-[40vh] md:h-full border-t md:border-t-0 md:border-l border-[#262626]">
+        <div className="w-full md:w-80 xl:w-120 bg-[#212328] text-white flex flex-col h-[50vh] md:h-full border-t md:border-t-0 md:border-l border-[#262626]">
           <div className="flex items-center gap-3 px-4 py-2 md:p-4 border-b border-[#262626]">
             <Link
               to={`/user/${post?.userId._id}`}
@@ -263,7 +263,7 @@ export default function PostModal({ open, postId, onClose }: PostModalProps) {
                       size={32}
                     />
                   </Link>
-                  <div className="flex-1 min-w-0 overflow-y-auto overscroll-contain">
+                  <div className="flex-1 min-w-0">
                     <div className="group">
                       <div className="flex items-start gap-2">
                         <div className="flex-1 min-w-0">
